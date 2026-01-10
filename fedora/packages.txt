@@ -1,0 +1,30 @@
+# Fedora packages (dnf)
+# One package per line, comments start with #
+
+# Core tools
+neovim
+tmux
+zsh
+git
+
+# Search & navigation
+fzf
+fd-find
+ripgrep
+eza
+
+# Development
+golang
+
+# Zsh plugins (install via dnf if available, otherwise manual)
+zsh-syntax-highlighting
+zsh-autosuggestions
+
+# Fonts
+fira-code-fonts
+
+# Note: Some tools need manual installation on Fedora:
+# - powerlevel10k: git clone to ~/.powerlevel10k
+# - uv: curl -LsSf https://astral.sh/uv/install.sh | sh
+# - cloudflared: https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/install-and-setup/installation/
+# - bun: curl -fsSL https://bun.sh/install | bash
