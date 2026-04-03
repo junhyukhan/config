@@ -17,6 +17,9 @@ config/
 │       └── config            # -> ~/.config/ghostty/config
 ├── vim/
 │   └── .vimrc               # -> ~/.vimrc
+├── cloudflared/
+│   └── .cloudflared/
+│       └── config.yml        # -> ~/.cloudflared/config.yml (dev gateway only)
 ├── legacy/
 │   └── karabiner/            # Retired configs (not linked)
 │       └── .config/karabiner/
@@ -104,3 +107,4 @@ Then commit and push.
 | **vim** | Basic vim config |
 | **Brewfile** | Homebrew packages and casks (macOS) |
 | **packages.txt** | dnf packages (Fedora) |
+| **cloudflared** | Dev gateway tunnel config (stow on active dev machine only) |

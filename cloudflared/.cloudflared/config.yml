@@ -1,0 +1,15 @@
+# Dev gateway tunnel — locally-managed ingress routing
+# Stow this to the active dev machine: stow -t ~ cloudflared
+# Credentials file is generated per-machine via: cloudflared tunnel create dev-gateway
+
+tunnel: dev-gateway
+# UPDATE after running `cloudflared tunnel create dev-gateway` on target machine
+credentials-file: /home/USER/.cloudflared/TUNNEL_ID.json
+
+ingress:
+  # Add dev services above the catch-all, then restart cloudflared
+  # - hostname: myapp.domain.com
+  #   service: http://localhost:3000
+
+  # Catch-all (required by cloudflared)
+  - service: http_status:404
