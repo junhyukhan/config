@@ -4,35 +4,43 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-This is a personal dotfiles repository for macOS and Fedora Linux. It manages configurations for nvim, zsh, ghostty terminal, and platform-specific settings.
+Personal dotfiles for macOS and Fedora Linux, managed with GNU Stow. Configs are symlinked from the repo into `$HOME`, so edits to either location are the same file.
 
-## Key Scripts
+## Key Commands
 
 ```bash
-# Deploy configs from repo to system (use on new machine or after pulling)
-./scripts/set_config.sh
+# Initial setup on a new machine (installs packages + creates symlinks)
+./setup.sh
 
-# Sync configs from system back to repo (use after local changes)
-./scripts/update_repo.sh
+# Link a single package manually
+stow -t ~ <package>
+
+# Unlink a package
+stow -t ~ -D <package>
+
+# Export package lists (run manually after installing new packages)
+# macOS:
+brew bundle dump --file=mac/Brewfile --force
+# Fedora:
+dnf repoquery --userinstalled --qf '%{name}' | sort > fedora/packages.txt
 ```
 
 ## Architecture
 
-**Cross-platform design**: Shared configs (nvim, ghostty, zsh) work on both platforms. Platform-specific configs are in `mac/` and `fedora/` directories, with OS detection in scripts using `$OSTYPE` for macOS and `/etc/fedora-release` for Fedora.
+**Symlink-based with GNU Stow**: Each top-level directory (shell, nvim, ghostty, vim, karabiner) is a stow package. The directory structure inside each package mirrors the path relative to `$HOME`. Running `stow -t ~ <package>` creates symlinks accordingly.
 
-**Two-way sync model**:
-- `set_config.sh`: Deploys from repo paths to system paths (e.g., `nvim/init.lua` → `~/.config/nvim/init.lua`)
-- `update_repo.sh`: Copies from system paths back to repo
+**Cross-platform zshrc**: OS detection at the top of `.zshrc` sets plugin/theme paths per platform. macOS uses Homebrew paths, Fedora uses `/usr/share/` and `~/powerlevel10k/`.
 
 **Package management**:
 - macOS: `mac/Brewfile` with `brew bundle`
 - Fedora: `fedora/packages.txt` with `dnf install`
 
-## Config Locations
+## Stow Packages
 
-| Repo Path | System Path |
-|-----------|-------------|
-| `nvim/init.lua` | `~/.config/nvim/init.lua` |
-| `ghostty/config` | `~/.config/ghostty/config` |
-| `zsh/zshrc` | `~/.zshrc` |
-| `mac/karabiner.json` | `~/.config/karabiner/karabiner.json` |
+| Package | Symlink Created |
+|---------|----------------|
+| shell | `~/.zshrc` |
+| nvim | `~/.config/nvim/init.lua` |
+| ghostty | `~/.config/ghostty/config` |
+| vim | `~/.vimrc` |
+| karabiner | `~/.config/karabiner/karabiner.json` (macOS only) |

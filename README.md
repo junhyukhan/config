@@ -1,25 +1,29 @@
 # config
 
-Personal dotfiles for macOS and Fedora Linux.
+Personal dotfiles for macOS and Fedora Linux, managed with [GNU Stow](https://www.gnu.org/software/stow/).
 
 ## Structure
 
 ```
 config/
-├── scripts/
-│   ├── set_config.sh    # Deploy configs from repo to system
-│   └── update_repo.sh   # Sync configs from system to repo
-├── mac/
-│   ├── Brewfile         # Homebrew packages
-│   └── karabiner.json   # Keyboard remapping
-├── fedora/
-│   └── packages.txt     # dnf packages
+├── setup.sh                 # Bootstrap script (packages + symlinks)
+├── shell/
+│   └── .zshrc               # -> ~/.zshrc
 ├── nvim/
-│   └── init.lua         # Neovim configuration
+│   └── .config/nvim/
+│       └── init.lua          # -> ~/.config/nvim/init.lua
 ├── ghostty/
-│   └── config           # Ghostty terminal config
-└── zsh/
-    └── zshrc            # Zsh configuration
+│   └── .config/ghostty/
+│       └── config            # -> ~/.config/ghostty/config
+├── vim/
+│   └── .vimrc               # -> ~/.vimrc
+├── karabiner/
+│   └── .config/karabiner/
+│       └── karabiner.json    # -> ~/.config/karabiner/karabiner.json (macOS)
+├── mac/
+│   └── Brewfile              # Homebrew packages
+└── fedora/
+    └── packages.txt          # dnf packages
 ```
 
 ## Quick Start
@@ -31,71 +35,63 @@ config/
    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
    ```
 
-2. Clone this repo and deploy configs:
+2. Clone and set up:
    ```bash
-   git clone https://github.com/junhyukhan/config.git ~/dev/github/config
-   cd ~/dev/github/config
-   ./scripts/set_config.sh
+   git clone https://github.com/junhyukhan/config.git ~/dev/config
+   cd ~/dev/config
+   ./setup.sh
    ```
-
-3. Set up Karabiner for right command key input switching:
-   - Install Karabiner Elements (included in Brewfile)
-   - Config is automatically deployed to `~/.config/karabiner/`
-   - In **System Settings > Keyboard > Shortcuts > Input Sources**, set input switch to F18
 
 ### Fedora
 
-1. Clone this repo and deploy configs:
-   ```bash
-   git clone https://github.com/junhyukhan/config.git ~/dev/github/config
-   cd ~/dev/github/config
-   ./scripts/set_config.sh
-   ```
-
-2. Some tools require manual installation:
-   ```bash
-   # Powerlevel10k
-   git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/.powerlevel10k
-
-   # uv (Python package manager)
-   curl -LsSf https://astral.sh/uv/install.sh | sh
-
-   # bun
-   curl -fsSL https://bun.sh/install | bash
-   ```
-
-## Usage
-
-### Deploying configs (repo to system)
-
-Run this on a new machine or after pulling updates:
-
 ```bash
-./scripts/set_config.sh
+git clone https://github.com/junhyukhan/config.git ~/dev/config
+cd ~/dev/config
+./setup.sh
 ```
 
-This will:
-- Copy nvim, ghostty, zsh configs to their system locations
-- **(Mac)** Install Homebrew packages and deploy Karabiner config
-- **(Fedora)** Install dnf packages
-
-### Saving configs (system to repo)
-
-Run this after making changes to your local configs:
-
+Some tools need manual installation on Fedora:
 ```bash
-./scripts/update_repo.sh
+# uv (Python package manager)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# bun
+curl -fsSL https://bun.sh/install | bash
 ```
 
-This will:
-- Copy nvim, ghostty, zsh configs from system to repo
-- **(Mac)** Dump Brewfile and copy Karabiner config
-- **(Fedora)** Export installed packages to packages.txt
+### Resolving conflicts
 
-Then commit and push your changes:
+If Stow reports "existing target is not owned by stow", remove or back up the conflicting file first:
 ```bash
-git add -A && git commit -m "update configs" && git push
+mv ~/.zshrc ~/.zshrc.bak
+./setup.sh
 ```
+
+## How it works
+
+GNU Stow creates symlinks from `$HOME` into this repo. When you edit `~/.config/nvim/init.lua`, you're editing the repo file directly -- no sync step needed.
+
+```bash
+# Link a specific package
+stow -t ~ nvim
+
+# Unlink a package
+stow -t ~ -D nvim
+```
+
+## Updating package lists
+
+After installing new packages, export the updated list:
+
+```bash
+# macOS
+brew bundle dump --file=mac/Brewfile --force
+
+# Fedora
+dnf repoquery --userinstalled --qf '%{name}' | sort > fedora/packages.txt
+```
+
+Then commit and push.
 
 ## What's Included
 
@@ -104,6 +100,12 @@ git add -A && git commit -m "update configs" && git push
 | **nvim** | Neovim config based on kickstart.nvim with LSP, Telescope, Treesitter |
 | **zsh** | Zsh with powerlevel10k, fzf, zoxide, syntax highlighting, autosuggestions |
 | **ghostty** | Ghostty terminal emulator config |
+| **vim** | Basic vim config |
 | **Brewfile** | Homebrew packages and casks (macOS) |
 | **karabiner** | Right command key remapped to F18 for input switching (macOS) |
 | **packages.txt** | dnf packages (Fedora) |
+
+### Karabiner (macOS)
+
+Right Command key is remapped to F18 when pressed alone. To use for input method switching:
+- **System Settings > Keyboard > Shortcuts > Input Sources** -- set input switch to F18

@@ -23,13 +23,22 @@ fi
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
 export EDITOR='nvim'
+export PATH="$HOME/.local/bin:$PATH"
 
-# Cache brew prefix once to speed up shell load time
-export BREW_PREFIX=$(brew --prefix)
+# Detect platform and set plugin/theme paths
+if [[ "$OSTYPE" == darwin* ]]; then
+    export BREW_PREFIX=$(brew --prefix)
+    ZSH_HIGHLIGHT="$BREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+    ZSH_SUGGEST="$BREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+    P10K_THEME="$BREW_PREFIX/share/powerlevel10k/powerlevel10k.zsh-theme"
+else
+    ZSH_HIGHLIGHT="/usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+    ZSH_SUGGEST="/usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+    P10K_THEME="$HOME/powerlevel10k/powerlevel10k.zsh-theme"
+fi
 
 # Kubernetes Config
 export KUBECONFIG=~/.kube/config:~/.kube/k3s-config
-# export iCLOUDFLARE_API_TOKEN=T8jsVDDJNFXhprqCbVFwNDAMlZw_MSc7YE9xhdEt
 
 # --------------------------------------------------------------------
 # Section 1: History Settings
@@ -65,7 +74,9 @@ fi
 
 # Initialize FZF
 # usage: Ctrl+T (files), Ctrl+R (history - unless Atuin takes over)
-source <(fzf --zsh)
+if command -v fzf >/dev/null 2>&1; then
+  source <(fzf --zsh)
+fi
 
 # --------------------------------------------------------------------
 # Section 4: Aliases
@@ -82,7 +93,7 @@ if command -v eza >/dev/null 2>&1; then
   alias la='eza --icons --group-directories-first -la'
   alias tree='eza --icons --tree'
 else
-  alias ls='ls -G'
+  alias ls='ls --color=auto'
   alias ll='ls -lFh'
   alias la='ls -lAFh'
 fi
@@ -102,14 +113,8 @@ alias vim='nvim'
 # --------------------------------------------------------------------
 
 # 1. Zsh Syntax Highlighting & Autosuggestions
-# (Check if files exist before sourcing to prevent errors)
-if [ -f "$BREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]; then
-    source "$BREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
-fi
-
-if [ -f "$BREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh" ]; then
-    source "$BREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
-fi
+[[ -f "$ZSH_HIGHLIGHT" ]] && source "$ZSH_HIGHLIGHT"
+[[ -f "$ZSH_SUGGEST" ]] && source "$ZSH_SUGGEST"
 
 # 2. Atuin (Magical Shell History)
 # This replaces standard Ctrl+R and Up-Arrow history search
@@ -129,10 +134,12 @@ fi
 
 # 3. Powerlevel10k Prompt
 # Must be last to capture previous command exit codes correctly
-source $(brew --prefix)/share/powerlevel10k/powerlevel10k.zsh-theme
+[[ -f "$P10K_THEME" ]] && source "$P10K_THEME"
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-# Added by Antigravity
-export PATH="/Users/junhyukhan/.antigravity/antigravity/bin:$PATH"
+# Antigravity (macOS only)
+if [[ "$OSTYPE" == darwin* ]] && [[ -d "$HOME/.antigravity/antigravity/bin" ]]; then
+    export PATH="$HOME/.antigravity/antigravity/bin:$PATH"
+fi
