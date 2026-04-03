@@ -92,6 +92,10 @@ if command -v eza >/dev/null 2>&1; then
   alias ll='eza --icons --group-directories-first -l'
   alias la='eza --icons --group-directories-first -la'
   alias tree='eza --icons --tree'
+elif [[ "$OSTYPE" == darwin* ]]; then
+  alias ls='ls -G'
+  alias ll='ls -lFh'
+  alias la='ls -lAFh'
 else
   alias ls='ls --color=auto'
   alias ll='ls -lFh'

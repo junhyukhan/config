@@ -3,5 +3,6 @@ CLAUDE.md
 setup.sh
 mac
 fedora
+legacy
 \.git
 \.stow-local-ignore

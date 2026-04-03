@@ -27,7 +27,7 @@ dnf repoquery --userinstalled --qf '%{name}' | sort > fedora/packages.txt
 
 ## Architecture
 
-**Symlink-based with GNU Stow**: Each top-level directory (shell, nvim, ghostty, vim, karabiner) is a stow package. The directory structure inside each package mirrors the path relative to `$HOME`. Running `stow -t ~ <package>` creates symlinks accordingly.
+**Symlink-based with GNU Stow**: Each top-level directory (shell, nvim, ghostty, vim) is a stow package. The directory structure inside each package mirrors the path relative to `$HOME`. Running `stow -t ~ <package>` creates symlinks accordingly.
 
 **Cross-platform zshrc**: OS detection at the top of `.zshrc` sets plugin/theme paths per platform. macOS uses Homebrew paths, Fedora uses `/usr/share/` and `~/powerlevel10k/`.
 
@@ -43,4 +43,11 @@ dnf repoquery --userinstalled --qf '%{name}' | sort > fedora/packages.txt
 | nvim | `~/.config/nvim/init.lua` |
 | ghostty | `~/.config/ghostty/config` |
 | vim | `~/.vimrc` |
-| karabiner | `~/.config/karabiner/karabiner.json` (macOS only) |
+
+### Legacy
+
+Retired configs live in `legacy/`. They are not stow-linked or installed by `setup.sh`.
+
+| Package | Notes |
+|---------|-------|
+| legacy/karabiner | Was `~/.config/karabiner/karabiner.json` (macOS). No longer used. |

@@ -41,8 +41,4 @@ echo "Linking configs..."
 cd "$REPO_DIR"
 stow -t "$HOME" shell nvim ghostty vim
 
-if [[ "$OSTYPE" == darwin* ]]; then
-    stow -t "$HOME" karabiner
-fi
-
 echo "Done! Restart your shell to apply changes."

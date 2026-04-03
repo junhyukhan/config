@@ -17,9 +17,10 @@ config/
 │       └── config            # -> ~/.config/ghostty/config
 ├── vim/
 │   └── .vimrc               # -> ~/.vimrc
-├── karabiner/
-│   └── .config/karabiner/
-│       └── karabiner.json    # -> ~/.config/karabiner/karabiner.json (macOS)
+├── legacy/
+│   └── karabiner/            # Retired configs (not linked)
+│       └── .config/karabiner/
+│           └── karabiner.json
 ├── mac/
 │   └── Brewfile              # Homebrew packages
 └── fedora/
@@ -102,10 +103,4 @@ Then commit and push.
 | **ghostty** | Ghostty terminal emulator config |
 | **vim** | Basic vim config |
 | **Brewfile** | Homebrew packages and casks (macOS) |
-| **karabiner** | Right command key remapped to F18 for input switching (macOS) |
 | **packages.txt** | dnf packages (Fedora) |
-
-### Karabiner (macOS)
-
-Right Command key is remapped to F18 when pressed alone. To use for input method switching:
-- **System Settings > Keyboard > Shortcuts > Input Sources** -- set input switch to F18
