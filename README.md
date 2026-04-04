@@ -17,6 +17,11 @@ config/
 │       └── config            # -> ~/.config/ghostty/config
 ├── vim/
 │   └── .vimrc               # -> ~/.vimrc
+├── claude/
+│   └── .claude/
+│       ├── settings.json     # -> ~/.claude/settings.json
+│       └── commands/
+│           └── commit-push.md # -> ~/.claude/commands/commit-push.md
 ├── cloudflared/
 │   └── .cloudflared/
 │       └── config.yml        # -> ~/.cloudflared/config.yml (dev gateway only)
@@ -107,4 +112,5 @@ Then commit and push.
 | **vim** | Basic vim config |
 | **Brewfile** | Homebrew packages and casks (macOS) |
 | **packages.txt** | dnf packages (Fedora) |
+| **claude** | Claude Code settings and custom slash commands |
 | **cloudflared** | Dev gateway tunnel config (stow on active dev machine only) |

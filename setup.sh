@@ -45,6 +45,6 @@ fi
 # --------------------------------------------------------------------
 echo "Linking configs..."
 cd "$REPO_DIR"
-stow -t "$HOME" shell nvim ghostty vim
+stow -t "$HOME" shell nvim ghostty vim claude
 
 echo "Done! Restart your shell to apply changes."
