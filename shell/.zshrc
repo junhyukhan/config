@@ -40,6 +40,9 @@ fi
 # Kubernetes Config
 export KUBECONFIG=~/.kube/config:~/.kube/k3s-config
 
+# Fix systemd pager warnings in non-standard terminals
+export SYSTEMD_LESS=FRXMK
+
 # --------------------------------------------------------------------
 # Section 1: History Settings
 # --------------------------------------------------------------------
