@@ -24,6 +24,12 @@ elif [[ -f /etc/fedora-release ]]; then
         echo "Cloning powerlevel10k..."
         git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$HOME/powerlevel10k"
     fi
+
+    # Install Ghostty terminfo system-wide so sudo commands work
+    if infocmp xterm-ghostty &>/dev/null && ! sudo infocmp xterm-ghostty &>/dev/null 2>&1; then
+        echo "Installing Ghostty terminfo system-wide..."
+        infocmp -x xterm-ghostty | sudo tic -x -
+    fi
 fi
 
 # --------------------------------------------------------------------
