@@ -4,12 +4,12 @@
 
 tunnel: dev-gateway
 # UPDATE after running `cloudflared tunnel create dev-gateway` on target machine
-credentials-file: /home/USER/.cloudflared/TUNNEL_ID.json
+credentials-file: /home/jhkn/.cloudflared/bb8222a8-00df-43e9-a329-e3aedf7b58c2.json
 
 ingress:
   # Add dev services above the catch-all, then restart cloudflared
-  # - hostname: myapp.domain.com
-  #   service: http://localhost:3000
+  - hostname: myapp.jhkn.dev
+    service: http://localhost:3000
 
   # Catch-all (required by cloudflared)
   - service: http_status:404
