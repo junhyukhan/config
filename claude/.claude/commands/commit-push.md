@@ -1,1 +1,0 @@
-Commit all staged and unstaged changes in the current repo, then push to the remote. Follow the git commit instructions from your system prompt exactly — check status, diff, recent log for style, draft an appropriate message, commit, then push.

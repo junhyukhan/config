@@ -21,7 +21,6 @@ config/
 │   └── .claude/
 │       ├── settings.json     # -> ~/.claude/settings.json
 │       └── commands/
-│           ├── commit-push.md      # -> ~/.claude/commands/commit-push.md
 │           ├── pr.md               # -> ~/.claude/commands/pr.md
 │           └── cloudflare-tunnel.md # -> ~/.claude/commands/cloudflare-tunnel.md
 ├── cloudflared/
