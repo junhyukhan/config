@@ -1,8 +1,21 @@
 {
   "model": "opus",
   "enabledPlugins": {
-    "typescript-lsp@claude-plugins-official": true,
-    "pr-review-toolkit@claude-plugins-official": true,
-    "frontend-design@claude-plugins-official": true
+    "discord@claude-plugins-official": true
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if echo \"$TOOL_INPUT\" | grep -q '\"command\".*git commit'; then git push 2>/dev/null; fi",
+            "if": "Bash(git commit*)",
+            "async": true
+          }
+        ]
+      }
+    ]
   }
 }
