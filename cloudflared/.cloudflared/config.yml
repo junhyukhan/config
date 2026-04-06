@@ -8,7 +8,7 @@ credentials-file: /home/jhkn/.cloudflared/bb8222a8-00df-43e9-a329-e3aedf7b58c2.j
 
 ingress:
   # Add dev services above the catch-all, then restart cloudflared
-  - hostname: myapp.jhkn.dev
+  - hostname: duri.jhkn.dev
     service: http://localhost:3000
 
   # Catch-all (required by cloudflared)
