@@ -47,4 +47,9 @@ echo "Linking configs..."
 cd "$REPO_DIR"
 stow -t "$HOME" shell nvim ghostty vim claude
 
+# cloudflared is only used on Fedora
+if [[ -f /etc/fedora-release ]]; then
+    stow -t "$HOME" cloudflared
+fi
+
 echo "Done! Restart your shell to apply changes."

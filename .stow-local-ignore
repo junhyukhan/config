@@ -6,3 +6,4 @@ fedora
 legacy
 \.git
 \.stow-local-ignore
+\.gitignore
