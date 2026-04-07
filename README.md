@@ -114,4 +114,4 @@ Then commit and push.
 | **Brewfile** | Homebrew packages and casks (macOS) |
 | **packages.txt** | dnf packages (Fedora) |
 | **claude** | Claude Code settings and custom slash commands |
-| **cloudflared** | Dev gateway tunnel config (Linux only — `stow -t ~ cloudflared` manually) |
+| **cloudflared** | Dev gateway tunnel config (Fedora only, auto-stowed by setup.sh) |
