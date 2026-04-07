@@ -45,6 +45,8 @@ fi
 # --------------------------------------------------------------------
 echo "Linking configs..."
 cd "$REPO_DIR"
+# cloudflared is excluded here — stow it manually on Linux dev machines:
+#   stow -t ~ cloudflared
 stow -t "$HOME" shell nvim ghostty vim claude
 
 echo "Done! Restart your shell to apply changes."

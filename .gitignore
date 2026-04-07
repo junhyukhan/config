@@ -1,0 +1,8 @@
+.DS_Store
+*.swp
+*.swo
+*~
+*.env
+*.pem
+*.key
+credentials*.json

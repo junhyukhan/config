@@ -40,11 +40,11 @@ dnf repoquery --userinstalled --qf '%{name}' | sort > fedora/packages.txt
 | Package | Symlink Created |
 |---------|----------------|
 | shell | `~/.zshrc` |
-| nvim | `~/.config/nvim/init.lua` |
+| nvim | `~/.config/nvim/init.lua`, `~/.config/nvim/lazy-lock.json` |
 | ghostty | `~/.config/ghostty/config` |
 | vim | `~/.vimrc` |
 | claude | `~/.claude/settings.json`, `~/.claude/commands/*` |
-| cloudflared | `~/.cloudflared/config.yml` (Linux only) |
+| cloudflared | `~/.cloudflared/config.yml` (Linux only, stow manually) |
 
 ### Legacy
 
