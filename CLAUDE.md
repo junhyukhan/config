@@ -44,7 +44,7 @@ dnf repoquery --userinstalled --qf '%{name}' | sort > fedora/packages.txt
 | ghostty | `~/.config/ghostty/config` |
 | vim | `~/.vimrc` |
 | claude | `~/.claude/settings.json`, `~/.claude/commands/*` |
-| cloudflared | `~/.cloudflared/config.yml` |
+| cloudflared | `~/.cloudflared/config.yml` (Linux only) |
 
 ### Legacy
 
