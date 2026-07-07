@@ -45,11 +45,20 @@ fi
 # --------------------------------------------------------------------
 echo "Linking configs..."
 cd "$REPO_DIR"
-stow -t "$HOME" shell nvim ghostty vim claude
+
+# --restow (-R) is idempotent: safe to re-run, and fixes broken links after
+# the repo is moved (stow's relative symlinks break when the repo path changes).
+stow -R -t "$HOME" shell nvim ghostty vim
+
+# claude uses --no-folding so ~/.claude stays a REAL directory with per-file
+# symlinks. Without it, stow folds the whole ~/.claude into one symlink and
+# Claude Code's runtime state (sessions, jobs, logs...) gets written into the
+# repo. See "Restowing / moving the repo" in README.md.
+stow -R --no-folding -t "$HOME" claude
 
 # cloudflared is only used on Fedora
 if [[ -f /etc/fedora-release ]]; then
-    stow -t "$HOME" cloudflared
+    stow -R -t "$HOME" cloudflared
 fi
 
 echo "Done! Restart your shell to apply changes."

@@ -77,6 +77,14 @@ mv ~/.zshrc ~/.zshrc.bak
 ./setup.sh
 ```
 
+### Moving the repo
+
+Stow uses relative symlinks, so moving this repo breaks every link. Just re-run setup from the new location — it uses `stow -R` (restow), which is idempotent and rebuilds the links:
+```bash
+cd /new/path/to/config
+./setup.sh
+```
+
 ## How it works
 
 GNU Stow creates symlinks from `$HOME` into this repo. When you edit `~/.config/nvim/init.lua`, you're editing the repo file directly -- no sync step needed.

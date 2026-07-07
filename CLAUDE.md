@@ -12,8 +12,11 @@ Personal dotfiles for macOS and Fedora Linux, managed with GNU Stow. Configs are
 # Initial setup on a new machine (installs packages + creates symlinks)
 ./setup.sh
 
-# Link a single package manually
-stow -t ~ <package>
+# Re-link everything (idempotent; also fixes links after moving the repo)
+./setup.sh
+
+# Link a single package manually (-R = restow, safe to re-run)
+stow -R -t ~ <package>
 
 # Unlink a package
 stow -t ~ -D <package>
@@ -28,6 +31,10 @@ dnf repoquery --userinstalled --qf '%{name}' | sort > fedora/packages.txt
 ## Architecture
 
 **Symlink-based with GNU Stow**: Each top-level directory (shell, nvim, ghostty, vim, claude, cloudflared) is a stow package. The directory structure inside each package mirrors the path relative to `$HOME`. Running `stow -t ~ <package>` creates symlinks accordingly.
+
+**Restowing / moving the repo**: Stow creates *relative* symlinks, so moving the repo directory breaks every link. To recover, re-run `./setup.sh` from the new location (it uses `stow -R`, which is idempotent and rebuilds the links).
+
+**`claude` package uses `--no-folding`**: Claude Code writes runtime state (`sessions/`, `jobs/`, `plugins/`, `history.jsonl`, logs, etc.) into `~/.claude`. If stow folds the whole directory into a single `~/.claude` symlink, all that runtime state lands inside this repo. `--no-folding` keeps `~/.claude` a real directory and symlinks only the tracked files (`settings.json`, `commands/*`). Runtime state is also ignored via `.gitignore` (`claude/.claude/*` with whitelisted configs).
 
 **Cross-platform zshrc**: OS detection at the top of `.zshrc` sets plugin/theme paths per platform. macOS uses Homebrew paths, Fedora uses `/usr/share/` and `~/powerlevel10k/`.
 

@@ -6,3 +6,9 @@
 *.pem
 *.key
 credentials*.json
+
+# Claude Code writes runtime state into ~/.claude (symlinked here).
+# Ignore everything under the package, then whitelist tracked configs.
+claude/.claude/*
+!claude/.claude/settings.json
+!claude/.claude/commands/
