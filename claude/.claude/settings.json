@@ -1,6 +1,18 @@
 {
   "model": "opus",
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Read|Edit|Grep|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$HOME/.claude/hooks/guard-secret-env.py\"",
+            "statusMessage": "Guarding secret env files"
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
         "matcher": "Bash",
