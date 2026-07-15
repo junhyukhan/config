@@ -38,7 +38,7 @@ else
 fi
 
 # Kubernetes Config
-export KUBECONFIG=~/.kube/config:~/.kube/k3s-config
+# export KUBECONFIG=~/.kube/config:~/.kube/k3s-config
 
 # --------------------------------------------------------------------
 # Section 1: History Settings
