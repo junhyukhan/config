@@ -54,18 +54,35 @@ READER = re.compile(
 )
 
 
-def bash_dumps_secret(cmd: str):
-    for m in ENVFILE.finditer(cmd):
-        tok = m.group(0)
-        if not is_secret_name(os.path.basename(tok)):
+# Pipeline / list separators. Splitting the command into segments means a reader
+# in ONE segment can't flag a .env that only appears in ANOTHER (e.g.
+# `printf x > a.env && ls | grep foo`).
+SEG_SPLIT = re.compile(r"\|\||&&|[|;&\n]")
+
+
+def _seg_reads_secret(seg: str):
+    for m in ENVFILE.finditer(seg):
+        name = os.path.basename(m.group(0))
+        if not is_secret_name(name):
             continue
-        # secret file referenced — is it in a content-dumping context?
-        if (
-            READER.search(cmd)
-            or re.search(r"<\s*" + re.escape(tok), cmd)   # redirection: cmd < .env
-            or "$(<" in cmd                                 # bash read: $(< .env)
-        ):
-            return os.path.basename(tok)
+        prefix = seg[:m.start()].rstrip()
+        if prefix.endswith(">"):    # write target (> .env, >> .env, 2> .env) — NOT a read
+            continue
+        if prefix.endswith("<"):    # read redirect (cmd < .env, $(< .env)) — a read
+            return name
+        if READER.search(seg):      # bare arg to a reader command in THIS segment — a read
+            return name
+    return None
+
+
+def bash_dumps_secret(cmd: str):
+    # A .env is only "dumped" if, within a single pipeline segment, it's read by a
+    # reader command or a `<` redirect. Writing to a .env, or a reader in a
+    # different segment, does not count.
+    for seg in SEG_SPLIT.split(cmd):
+        hit = _seg_reads_secret(seg)
+        if hit:
+            return hit
     return None
 
 
