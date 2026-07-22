@@ -1,27 +1,25 @@
 #!/usr/bin/env python3
-"""SessionEnd hook: commit accumulated journal lines, then push every
+"""On-demand workspace repo-sync: commit pending journal/ lines, then push every
 workspace repo that is ahead of its upstream.
 
-The workspace (~/workdir/repos) is a meta-repo of independent git repos. Rather
-than trying to detect which repo each commit touched (commits happen via inline
-`cd`, so the tool cwd lies), this runs once at session end and reconciles state:
+Replaces the old SessionEnd push hook. This runs *in-session* — via the
+`/sync-repos` skill, the SessionStart nudge that flags unpushed repos, or directly
+(`python3 ~/.claude/skills/sync-repos/repos-sync.py`). Running in-session means the
+output is visible, there's no reliance on a lifecycle hook the harness can kill
+mid-run, and no dependence on SessionEnd firing at all (it doesn't, if you just
+close the terminal).
 
-  1. If journal/ has uncommitted changes in the meta-repo, commit them
-     (pathspec-scoped, so it can ONLY ever touch journal/ — never sweeps up
-     unrelated in-progress work). Guarded by a lock so concurrent session-ends
-     don't race the meta-repo index.
-  2. Push every repo that is strictly ahead of its upstream and NOT diverged.
-     Never force. Diverged / no-upstream / offline repos are skipped.
+Safety: only pushes committed, strictly-ahead, non-diverged repos; never force;
+skips no-upstream / offline / diverged (reported, not pushed). The journal commit
+is pathspec-scoped to `journal/`, so it can never sweep up in-progress work.
 
-Composes with manual pushes: a repo you already pushed is no longer ahead, so
-it's a no-op here. Fail-silent for the *session* (a sync miss must never break a
-session), but NOT silent for you:
+Observability:
+  - Prints a summary to stdout (the caller / agent sees it inline).
+  - Appends one line to ~/.claude/repo-sync.log — `tail ~/.claude/repo-sync.log`.
+  - PROBLEM-ONLY Discord alert via ~/.claude/.discord-webhook, kept for future use:
+    inert unless that file exists AND a push failed / a repo diverged.
 
-  - Every run appends one summary line (plus detail lines for failures) to
-    ~/.claude/repo-sync.log — `tail ~/.claude/repo-sync.log`.
-  - PROBLEM-ONLY live alert: when a push fails or a repo is diverged, it POSTs a
-    Discord message. Configure by putting your incoming-webhook URL (one line) in
-    ~/.claude/.discord-webhook — INERT until that file exists; successes stay silent.
+Exit code: 0 if everything synced cleanly, 1 if any repo needs attention.
 """
 import fcntl
 import json
@@ -42,11 +40,15 @@ PRUNE = {"node_modules", ".git", "archive", "dist", ".next", ".astro", "build", 
 MAX_DEPTH = 3
 PUSH_TIMEOUT = 30
 
+# Never let git block on a credential/terminal prompt — fail fast instead of hang.
+GIT_ENV = {**os.environ, "GIT_TERMINAL_PROMPT": "0"}
+
 
 def git(root, *args, timeout=10):
     return subprocess.run(
         ["git", "-C", str(root), *args],
         capture_output=True, text=True, timeout=timeout,
+        stdin=subprocess.DEVNULL, env=GIT_ENV,
     )
 
 
@@ -68,9 +70,8 @@ def find_repos(root):
 def commit_journal():
     """Commit uncommitted journal/ changes in the meta-repo, pathspec-scoped.
 
-    Returns: "committed" | "clean" | "locked". Locked so two session-ends can't
-    race the shared meta-repo index; whoever loses simply skips (the winner or
-    the next session commits their lines).
+    Returns: "committed" | "clean" | "locked". Locked (non-blocking) so two callers
+    can't race the shared meta-repo index; whoever loses simply skips.
     """
     status = git(REPOS_ROOT, "status", "--porcelain", "--", "journal")
     if status.returncode != 0 or not status.stdout.strip():
@@ -83,7 +84,7 @@ def commit_journal():
         return "locked"
     try:
         if not git(REPOS_ROOT, "status", "--porcelain", "--", "journal").stdout.strip():
-            return "clean"  # a racing session just committed
+            return "clean"  # a racing caller just committed
         week = datetime.now().strftime("%G-W%V")
         git(REPOS_ROOT, "add", "--", "journal")
         r = git(REPOS_ROOT, "commit", "-q", "-m", f"journal: session stubs ({week})", "--", "journal")
@@ -97,7 +98,7 @@ def push_ahead(root):
     """Reconcile one repo. Returns (name, outcome) or None if nothing to report.
 
     outcome ∈ {"pushed", "diverged", "failed: <reason>"}. Up-to-date and
-    no-upstream repos return None (not worth a log line).
+    no-upstream repos return None.
     """
     name = os.path.relpath(root, REPOS_ROOT)
     if name == ".":
@@ -142,7 +143,6 @@ def log_run(session_id, journal_status, outcomes):
     lines = [summary + "\n"]
     for name, outcome in problems:
         lines.append(f"    ! {name}: {outcome}\n")
-
     try:
         LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
         with open(LOG_PATH, "a", encoding="utf-8") as f:
@@ -156,7 +156,8 @@ def log_run(session_id, journal_status, outcomes):
 
 def notify_discord(problems):
     """Problem-only Discord alert via an incoming webhook. No-op unless a URL is
-    configured in ~/.claude/.discord-webhook. Best-effort — never blocks/raises."""
+    configured in ~/.claude/.discord-webhook. Best-effort — never blocks/raises.
+    Kept wired for future use; the in-session summary is the primary channel now."""
     if not problems:
         return
     try:
@@ -177,17 +178,13 @@ def notify_discord(problems):
     try:
         urllib.request.urlopen(req, timeout=10)
     except Exception:
-        pass  # alert is best-effort; the log still has the record
+        pass  # alert is best-effort; the log + stdout still have the record
 
 
 def main():
-    session_id = ""
-    try:
-        session_id = (json.load(sys.stdin) or {}).get("session_id", "")
-    except (json.JSONDecodeError, ValueError):
-        pass
     if not REPOS_ROOT.is_dir():
-        return
+        print(f"repos-sync: no workspace at {REPOS_ROOT}")
+        return 0
     journal_status = commit_journal()
     outcomes = []
     for repo in find_repos(REPOS_ROOT):
@@ -197,13 +194,21 @@ def main():
             result = (os.path.relpath(repo, REPOS_ROOT), "failed: timeout")
         if result:
             outcomes.append(result)
+
+    session_id = os.environ.get("CLAUDE_SESSION_ID", "manual")
     log_run(session_id, journal_status, outcomes)
-    notify_discord([(n, o) for n, o in outcomes if o != "pushed"])
+    problems = [(n, o) for n, o in outcomes if o != "pushed"]
+    notify_discord(problems)
+
+    pushed = [n for n, o in outcomes if o == "pushed"]
+    print(f"repos-sync · journal={journal_status} · "
+          f"pushed: {', '.join(pushed) if pushed else 'none'}")
+    for name, outcome in problems:
+        print(f"  ! {name}: {outcome}  (needs a manual look)")
+    if not pushed and not problems:
+        print("  everything already in sync.")
+    return 1 if problems else 0
 
 
 if __name__ == "__main__":
-    try:
-        main()
-    except Exception:
-        pass  # never break a session over a sync
-    sys.exit(0)
+    sys.exit(main())

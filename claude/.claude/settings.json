@@ -13,6 +13,17 @@
         ]
       }
     ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$HOME/.claude/hooks/repos-ahead-notice.py\"",
+            "statusMessage": "Checking for unpushed workspace repos"
+          }
+        ]
+      }
+    ],
     "SessionEnd": [
       {
         "hooks": [
@@ -20,11 +31,6 @@
             "type": "command",
             "command": "python3 \"$HOME/.claude/hooks/journal-session-end.py\"",
             "statusMessage": "Appending session to work journal"
-          },
-          {
-            "type": "command",
-            "command": "python3 \"$HOME/.claude/hooks/sync-repos-session-end.py\"",
-            "statusMessage": "Committing journal + pushing ahead repos"
           }
         ]
       }
