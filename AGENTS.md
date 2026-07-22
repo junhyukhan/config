@@ -50,8 +50,26 @@ dnf repoquery --userinstalled --qf '%{name}' | sort > fedora/packages.txt
 | nvim | `~/.config/nvim/init.lua`, `~/.config/nvim/lazy-lock.json` |
 | ghostty | `~/.config/ghostty/config` |
 | vim | `~/.vimrc` |
-| claude | `~/.claude/settings.json`, `~/.claude/commands/*` |
+| claude | `~/.claude/` — `settings.json`, `AGENTS.md` + `CLAUDE.md` (global agent instructions), `commands/*` (slash commands), `hooks/*` (e.g. `guard-secret-env.py`), `skills/*` (global skills) — all via `--no-folding` |
 | cloudflared | `~/.cloudflared/config.yml` (Fedora only, auto-stowed on Fedora) |
+
+> The `claude` package is this repo's **agent-config home**: everything under
+> `~/.claude` that should be versioned + portable (settings, the global `AGENTS.md`,
+> slash commands, hooks, skills) lives in `claude/.claude/` and is Stow-linked. Add a
+> new hook/command/skill by dropping the file there and re-running `./setup.sh` (or
+> `stow -R --no-folding -t ~ claude`) — never hand-create the symlink.
+
+## Agent tooling (workspace scaffolding)
+
+Beyond dotfiles, this repo carries tooling for the `~/workdir/repos` agent workflow:
+
+- **`templates/`** — canonical `AGENTS.md.tmpl` + `CLAUDE.md.tmpl` for a new project repo.
+- **`scripts/new-repo.sh <dir>`** — scaffolds those two files into a new repo (filled
+  with its name) and prints the steps to wire it into the workspace meta-repo
+  (`repos/.gitignore` line + `repos/AGENTS.md` table row). Keeps every new project on
+  the standard agent-context shape.
+- **`claude/.claude/skills/`** — the versioned home for personal global Claude skills
+  (see its `README.md`).
 
 ### Legacy
 
