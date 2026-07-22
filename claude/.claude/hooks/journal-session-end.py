@@ -1,9 +1,15 @@
 #!/usr/bin/env python3
-"""SessionEnd hook: append a one-line stub for this session to the work journal.
+"""SessionEnd hook: append a one-line stub for this session to the work journal,
+then commit just that line (local, pathspec-scoped, no push).
 
 Journal layout: ~/workdir/repos/journal/YYYY/YYYY-Www.md (ISO week, one file per
 week, append-only). Each line: timestamp, repo, first real user ask (truncated),
 session id. Zero agent tokens — this runs as a plain script after the session ends.
+
+Committing here keeps the working tree clean after every session; pushing stays
+off the lifecycle (on-demand via /sync-repos) so nothing in this hook can hang on
+the network. The commit is safe at SessionEnd — the "don't auto-commit" concern was
+index contention with a *live* session, which is gone once the session has ended.
 
 Fail-silent by design: a journal miss must never break a session. The transcript
 is read only to pull the FIRST user prompt; nothing else leaves it.
@@ -11,6 +17,7 @@ is read only to pull the FIRST user prompt; nothing else leaves it.
 import json
 import os
 import re
+import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -60,6 +67,27 @@ def repo_label(cwd):
     return rel.parts[0] if rel.parts else "repos"
 
 
+def commit_stub(repo_root, week_file):
+    """Commit just this journal line — pathspec-scoped, local, never pushes.
+
+    The explicit `-- <path>` on both add and commit means only the journal file is
+    ever touched; unrelated staged/working changes in the meta-repo are left alone.
+    A concurrent SessionEnd in another repo can lose the git index.lock race; that
+    just leaves the line uncommitted for the next sweep to pick up (same as before).
+    """
+    rel = str(week_file.relative_to(repo_root))
+    env = {**os.environ, "GIT_TERMINAL_PROMPT": "0"}
+
+    def git(*args):
+        return subprocess.run(
+            ["git", "-C", str(repo_root), *args],
+            capture_output=True, text=True, stdin=subprocess.DEVNULL, timeout=10, env=env,
+        )
+
+    git("add", "--", rel)
+    git("commit", "-m", f"journal: session stub ({week_file.stem})", "--", rel)
+
+
 def main():
     data = json.load(sys.stdin)
     session_id = data.get("session_id", "")
@@ -84,6 +112,8 @@ def main():
     entry = f"- **{now.strftime('%Y-%m-%d %H:%M')}** · `{repo_label(data.get('cwd', ''))}` — {ask} (`{short_id}`)\n"
     with open(week_file, "a", encoding="utf-8") as f:
         f.write(entry)
+
+    commit_stub(JOURNAL_ROOT.parent, week_file)
 
 
 if __name__ == "__main__":
