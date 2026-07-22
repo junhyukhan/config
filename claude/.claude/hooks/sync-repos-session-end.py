@@ -11,11 +11,13 @@ than trying to detect which repo each commit touched (commits happen via inline
      unrelated in-progress work). Guarded by a lock so concurrent session-ends
      don't race the meta-repo index.
   2. Push every repo that is strictly ahead of its upstream and NOT diverged.
-     Never force. Diverged / no-upstream / offline repos are skipped silently.
+     Never force. Diverged / no-upstream / offline repos are skipped.
 
 Composes with manual pushes: a repo you already pushed is no longer ahead, so
-it's a no-op here. Fail-silent by design — a sync miss must never break a
-session, and next session's sweep catches whatever was missed.
+it's a no-op here. Fail-silent for the *session* (a sync miss must never break a
+session), but NOT silent for you: every run appends one summary line (plus detail
+lines for failures) to ~/.claude/repo-sync.log so you can always see whether it
+ran and whether each push succeeded — `tail ~/.claude/repo-sync.log`.
 """
 import fcntl
 import json
@@ -27,6 +29,8 @@ from pathlib import Path
 
 REPOS_ROOT = Path.home() / "workdir" / "repos"
 LOCK_PATH = Path.home() / ".claude" / ".journal-sync.lock"
+LOG_PATH = Path.home() / ".claude" / "repo-sync.log"
+LOG_MAX_LINES = 1000
 PRUNE = {"node_modules", ".git", "archive", "dist", ".next", ".astro", "build", ".venv"}
 MAX_DEPTH = 3
 PUSH_TIMEOUT = 30
@@ -57,61 +61,110 @@ def find_repos(root):
 def commit_journal():
     """Commit uncommitted journal/ changes in the meta-repo, pathspec-scoped.
 
-    Locked so two session-ends can't race the shared meta-repo index. Whoever
-    loses the lock simply skips — their lines get committed by the winner or by
-    the next session. Returns without raising on any failure.
+    Returns: "committed" | "clean" | "locked". Locked so two session-ends can't
+    race the shared meta-repo index; whoever loses simply skips (the winner or
+    the next session commits their lines).
     """
     status = git(REPOS_ROOT, "status", "--porcelain", "--", "journal")
     if status.returncode != 0 or not status.stdout.strip():
-        return  # nothing pending under journal/
+        return "clean"
     LOCK_PATH.parent.mkdir(parents=True, exist_ok=True)
     lock = open(LOCK_PATH, "w")
     try:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
     except BlockingIOError:
-        return  # another session owns the journal commit right now
+        return "locked"
     try:
-        # re-check under lock; a racing session may have just committed
         if not git(REPOS_ROOT, "status", "--porcelain", "--", "journal").stdout.strip():
-            return
+            return "clean"  # a racing session just committed
         week = datetime.now().strftime("%G-W%V")
         git(REPOS_ROOT, "add", "--", "journal")
-        git(REPOS_ROOT, "commit", "-q", "-m", f"journal: session stubs ({week})", "--", "journal")
+        r = git(REPOS_ROOT, "commit", "-q", "-m", f"journal: session stubs ({week})", "--", "journal")
+        return "committed" if r.returncode == 0 else "clean"
     finally:
         fcntl.flock(lock, fcntl.LOCK_UN)
         lock.close()
 
 
 def push_ahead(root):
-    """Push `root` iff it has an upstream, is ahead, and is not diverged."""
+    """Reconcile one repo. Returns (name, outcome) or None if nothing to report.
+
+    outcome ∈ {"pushed", "diverged", "failed: <reason>"}. Up-to-date and
+    no-upstream repos return None (not worth a log line).
+    """
+    name = os.path.relpath(root, REPOS_ROOT)
+    if name == ".":
+        name = "repos"
     counts = git(root, "rev-list", "--left-right", "--count", "@{u}...HEAD")
     if counts.returncode != 0:
-        return  # no upstream / detached / not a work tree
+        return None  # no upstream / detached / not a work tree
     try:
         behind, ahead = (int(x) for x in counts.stdout.split())
     except ValueError:
-        return
-    if ahead == 0 or behind > 0:
-        return  # nothing to push, or diverged (never force) — skip silently
+        return None
+    if ahead == 0:
+        return None  # up to date
+    if behind > 0:
+        return (name, "diverged")  # never force — report so it's visible
     try:
-        git(root, "push", timeout=PUSH_TIMEOUT)
+        r = git(root, "push", timeout=PUSH_TIMEOUT)
     except subprocess.TimeoutExpired:
-        pass  # offline / slow remote — next sweep retries
+        return (name, "failed: timeout (offline?)")
+    if r.returncode == 0:
+        return (name, "pushed")
+    lines = [ln.strip() for ln in (r.stderr or r.stdout or "").splitlines() if ln.strip()]
+    reason = next(
+        (ln for ln in lines if any(k in ln.lower()
+         for k in ("rejected", "fatal", "denied", "error", "failed"))),
+        lines[0] if lines else "unknown",
+    )
+    return (name, f"failed: {reason[:120]}")
+
+
+def log_run(session_id, journal_status, outcomes):
+    """Append one summary line (+ detail lines for problems) and trim the log."""
+    pushed = [n for n, o in outcomes if o == "pushed"]
+    problems = [(n, o) for n, o in outcomes if o != "pushed"]
+    stamp = datetime.now().strftime("%Y-%m-%d %H:%M")
+    summary = (
+        f"{stamp} · session={session_id[:8] or '?'} · journal={journal_status} · "
+        f"pushed: {', '.join(pushed) if pushed else 'none'}"
+    )
+    if problems:
+        summary += f" · ATTENTION: {len(problems)}"
+    lines = [summary + "\n"]
+    for name, outcome in problems:
+        lines.append(f"    ! {name}: {outcome}\n")
+
+    try:
+        LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
+        with open(LOG_PATH, "a", encoding="utf-8") as f:
+            f.writelines(lines)
+        existing = LOG_PATH.read_text(encoding="utf-8").splitlines(keepends=True)
+        if len(existing) > LOG_MAX_LINES:
+            LOG_PATH.write_text("".join(existing[-LOG_MAX_LINES:]), encoding="utf-8")
+    except OSError:
+        pass
 
 
 def main():
+    session_id = ""
     try:
-        json.load(sys.stdin)  # drain payload; sweep needs no field from it
+        session_id = (json.load(sys.stdin) or {}).get("session_id", "")
     except (json.JSONDecodeError, ValueError):
         pass
     if not REPOS_ROOT.is_dir():
         return
-    commit_journal()
+    journal_status = commit_journal()
+    outcomes = []
     for repo in find_repos(REPOS_ROOT):
         try:
-            push_ahead(repo)
+            result = push_ahead(repo)
         except subprocess.TimeoutExpired:
-            pass
+            result = (os.path.relpath(repo, REPOS_ROOT), "failed: timeout")
+        if result:
+            outcomes.append(result)
+    log_run(session_id, journal_status, outcomes)
 
 
 if __name__ == "__main__":
