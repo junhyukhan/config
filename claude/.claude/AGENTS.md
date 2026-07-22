@@ -30,3 +30,22 @@ from wherever that repo tracks work — not left in chat, and not only in your m
 exact phrasing, informal wording and all — that *is* verbatim. The raw wording captures intent and
 taste better than a tidy restatement, and keeps a record of the product judgment and how each
 decision evolved.
+
+## Working style: discuss design forks; don't self-authorize commits/pushes
+
+When building, if you find yourself **choosing between viable approaches** — a design fork, a
+tradeoff, a taste (취향) call, anything with real pros/cons — **stop and lay out the options with
+a recommendation, then let me decide.** Don't quietly resolve it and implement. A fork is a fork
+even mid-build; "it felt like part of the implementation" is not a reason to skip the check. When
+unsure, a two-line "options X / Y, I lean X — ok?" is the cheap hedge.
+
+**Never commit or push on my behalf unless I ask.** Building a feature is not authorization to
+land it in git. Make the edits; leave committing and pushing to me (or to the approved
+session-end sync hook). "It was on the permission allowlist" is not "it should have been run" —
+*allowed ≠ should*.
+
+**Just do it** (no pre-check) for the reversible, single-obvious-answer things: typos, stale
+refs, searches, reading, running tests, local edits I can undo. **Ask first** for: design forks,
+outward-facing or hard-to-reverse actions (commit, push, send, publish, delete, deploy), and
+anything that creates standing config or automation. When in doubt, ask — it's cheap; a wrong
+autonomous commit/push is not.

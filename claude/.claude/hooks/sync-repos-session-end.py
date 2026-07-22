@@ -15,21 +15,28 @@ than trying to detect which repo each commit touched (commits happen via inline
 
 Composes with manual pushes: a repo you already pushed is no longer ahead, so
 it's a no-op here. Fail-silent for the *session* (a sync miss must never break a
-session), but NOT silent for you: every run appends one summary line (plus detail
-lines for failures) to ~/.claude/repo-sync.log so you can always see whether it
-ran and whether each push succeeded — `tail ~/.claude/repo-sync.log`.
+session), but NOT silent for you:
+
+  - Every run appends one summary line (plus detail lines for failures) to
+    ~/.claude/repo-sync.log — `tail ~/.claude/repo-sync.log`.
+  - PROBLEM-ONLY live alert: when a push fails or a repo is diverged, it POSTs a
+    Discord message. Configure by putting your incoming-webhook URL (one line) in
+    ~/.claude/.discord-webhook — INERT until that file exists; successes stay silent.
 """
 import fcntl
 import json
 import os
+import socket
 import subprocess
 import sys
+import urllib.request
 from datetime import datetime
 from pathlib import Path
 
 REPOS_ROOT = Path.home() / "workdir" / "repos"
 LOCK_PATH = Path.home() / ".claude" / ".journal-sync.lock"
 LOG_PATH = Path.home() / ".claude" / "repo-sync.log"
+WEBHOOK_PATH = Path.home() / ".claude" / ".discord-webhook"
 LOG_MAX_LINES = 1000
 PRUNE = {"node_modules", ".git", "archive", "dist", ".next", ".astro", "build", ".venv"}
 MAX_DEPTH = 3
@@ -147,6 +154,28 @@ def log_run(session_id, journal_status, outcomes):
         pass
 
 
+def notify_discord(problems):
+    """Problem-only Discord alert via an incoming webhook. No-op unless a URL is
+    configured in ~/.claude/.discord-webhook. Best-effort — never blocks/raises."""
+    if not problems:
+        return
+    try:
+        url = WEBHOOK_PATH.read_text(encoding="utf-8").strip()
+    except OSError:
+        return
+    if not url.startswith("https://"):
+        return
+    host = socket.gethostname().split(".")[0]
+    detail = "\n".join(f"• `{name}`: {outcome}" for name, outcome in problems)
+    content = f"⚠️ **repo-sync** on `{host}` needs attention:\n{detail}"
+    data = json.dumps({"content": content[:1900]}).encode("utf-8")
+    req = urllib.request.Request(url, data=data, headers={"Content-Type": "application/json"})
+    try:
+        urllib.request.urlopen(req, timeout=10)
+    except Exception:
+        pass  # alert is best-effort; the log still has the record
+
+
 def main():
     session_id = ""
     try:
@@ -165,6 +194,7 @@ def main():
         if result:
             outcomes.append(result)
     log_run(session_id, journal_status, outcomes)
+    notify_discord([(n, o) for n, o in outcomes if o != "pushed"])
 
 
 if __name__ == "__main__":
