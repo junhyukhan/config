@@ -20,19 +20,11 @@
             "type": "command",
             "command": "python3 \"$HOME/.claude/hooks/journal-session-end.py\"",
             "statusMessage": "Appending session to work journal"
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
+          },
           {
             "type": "command",
-            "command": "if echo \"$TOOL_INPUT\" | grep -q '\"command\".*git commit'; then git push 2>/dev/null; fi",
-            "if": "Bash(git commit*)",
-            "async": true
+            "command": "python3 \"$HOME/.claude/hooks/sync-repos-session-end.py\"",
+            "statusMessage": "Committing journal + pushing ahead repos"
           }
         ]
       }
