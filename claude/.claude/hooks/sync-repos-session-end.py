@@ -169,7 +169,11 @@ def notify_discord(problems):
     detail = "\n".join(f"• `{name}`: {outcome}" for name, outcome in problems)
     content = f"⚠️ **repo-sync** on `{host}` needs attention:\n{detail}"
     data = json.dumps({"content": content[:1900]}).encode("utf-8")
-    req = urllib.request.Request(url, data=data, headers={"Content-Type": "application/json"})
+    req = urllib.request.Request(url, data=data, headers={
+        "Content-Type": "application/json",
+        # Discord sits behind Cloudflare, which 403s the default python-urllib UA.
+        "User-Agent": "duri-repo-sync/1.0 (+workspace hook)",
+    })
     try:
         urllib.request.urlopen(req, timeout=10)
     except Exception:
