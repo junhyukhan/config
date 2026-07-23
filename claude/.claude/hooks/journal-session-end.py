@@ -3,8 +3,11 @@
 then commit just that line (local, pathspec-scoped, no push).
 
 Journal layout: ~/workdir/repos/journal/YYYY/YYYY-Www.md (ISO week, one file per
-week, append-only). Each line: timestamp, repo, first real user ask (truncated),
-session id. Zero agent tokens — this runs as a plain script after the session ends.
+week, append-only). Each line is a pure time-marker: timestamp, repo, session id.
+Prompt text is deliberately NOT recorded — the first user prompt is usually
+orientation/bookkeeping ("do I have unpushed repos"), so capturing it masqueraded as
+a summary without being one; substance lives in hand-written layer-2 lines. Zero agent
+tokens — this runs as a plain script after the session ends.
 
 Committing here keeps the working tree clean after every session; pushing stays
 off the lifecycle (on-demand via /sync-repos) so nothing in this hook can hang on
@@ -12,11 +15,11 @@ the network. The commit is safe at SessionEnd — the "don't auto-commit" concer
 index contention with a *live* session, which is gone once the session has ended.
 
 Fail-silent by design: a journal miss must never break a session. The transcript
-is read only to pull the FIRST user prompt; nothing else leaves it.
+is read only to check that a real user prompt exists (the trivial-session gate); no
+transcript content is recorded.
 """
 import json
 import os
-import re
 import subprocess
 import sys
 from datetime import datetime
@@ -24,11 +27,14 @@ from pathlib import Path
 
 JOURNAL_ROOT = Path.home() / "workdir" / "repos" / "journal"
 REPOS_ROOT = Path.home() / "workdir" / "repos"
-MAX_ASK_LEN = 140
 
 
-def first_user_ask(transcript_path):
-    """First real (typed) user message in the transcript, or None."""
+def has_real_user_prompt(transcript_path):
+    """True if the transcript holds at least one real (typed) user message.
+
+    Used only as a gate: a session with no typed prompt is trivial and gets no journal
+    line. The message text itself is not recorded — the stub is a pure time-marker.
+    """
     try:
         with open(transcript_path, encoding="utf-8") as f:
             for line in f:
@@ -49,13 +55,10 @@ def first_user_ask(transcript_path):
                 # skip harness-injected wrappers, slash-command envelopes, resume caveats
                 if not text or text.startswith(("<", "Caveat:")):
                     continue
-                text = re.sub(r"\s+", " ", text)
-                if len(text) > MAX_ASK_LEN:
-                    text = text[: MAX_ASK_LEN - 1] + "…"
-                return text
+                return True
     except OSError:
         pass
-    return None
+    return False
 
 
 def repo_label(cwd):
@@ -91,8 +94,7 @@ def commit_stub(repo_root, week_file):
 def main():
     data = json.load(sys.stdin)
     session_id = data.get("session_id", "")
-    ask = first_user_ask(data.get("transcript_path", ""))
-    if not ask:  # no real user prompt -> trivial session, skip
+    if not has_real_user_prompt(data.get("transcript_path", "")):  # trivial session, skip
         return
 
     if not JOURNAL_ROOT.parent.is_dir():  # machine without the workspace checkout
@@ -109,7 +111,7 @@ def main():
     if not week_file.exists():
         week_file.write_text(f"# Journal — {now.strftime('%G-W%V')}\n\n", encoding="utf-8")
 
-    entry = f"- **{now.strftime('%Y-%m-%d %H:%M')}** · `{repo_label(data.get('cwd', ''))}` — {ask} (`{short_id}`)\n"
+    entry = f"- **{now.strftime('%Y-%m-%d %H:%M')}** · `{repo_label(data.get('cwd', ''))}` · `{short_id}`\n"
     with open(week_file, "a", encoding="utf-8") as f:
         f.write(entry)
 
