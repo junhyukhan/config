@@ -23,17 +23,6 @@
           }
         ]
       }
-    ],
-    "SessionEnd": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 \"$HOME/.claude/hooks/journal-session-end.py\"",
-            "statusMessage": "Appending session to work journal"
-          }
-        ]
-      }
     ]
   },
   "enabledPlugins": {
