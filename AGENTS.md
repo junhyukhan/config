@@ -6,6 +6,13 @@ Guidance for any coding agent working in this repository.
 
 Personal dotfiles for macOS and Fedora Linux, managed with GNU Stow. Configs are symlinked from the repo into `$HOME`, so edits to either location are the same file.
 
+## Docs
+
+Project state and decisions live in `docs/` — start at **`docs/README.md`** (status + index).
+Design decisions are captured **verbatim** in `docs/decisions/` (one file per topic; copy
+`docs/decisions/TEMPLATE.md`). This is the workspace-wide shape — see
+`../docs/repo-docs-standardization.md`.
+
 ## Key Commands
 
 ```bash
