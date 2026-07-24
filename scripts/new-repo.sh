@@ -20,6 +20,22 @@ for f in AGENTS.md CLAUDE.md; do
   echo "wrote $name/$f"
 done
 
+# Seed the standard docs/ structure (see repos/docs/repo-docs-standardization.md):
+# docs/README.md = current status + index; docs/decisions/ = verbatim decision notes.
+mkdir -p "$name/docs/decisions"
+if [[ -e "$name/docs/README.md" ]]; then
+  echo "skip  $name/docs/README.md (already exists)"
+else
+  sed "s/{{NAME}}/$base/g" "$tmpl_dir/docs-README.md.tmpl" > "$name/docs/README.md"
+  echo "wrote $name/docs/README.md"
+fi
+if [[ -e "$name/docs/decisions/TEMPLATE.md" ]]; then
+  echo "skip  $name/docs/decisions/TEMPLATE.md (already exists)"
+else
+  cp "$tmpl_dir/decision.md.tmpl" "$name/docs/decisions/TEMPLATE.md"
+  echo "wrote $name/docs/decisions/TEMPLATE.md"
+fi
+
 cat <<NOTE
 
 Done. Now wire it into the workspace meta-repo (~/workdir/repos):
