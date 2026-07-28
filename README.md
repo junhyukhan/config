@@ -116,6 +116,40 @@ stow -R --no-folding -t ~ claude
 stow -t ~ -D nvim
 ```
 
+## Updating on another machine
+
+Pulling is often enough, but not always — Stow links **per file**, so a file that didn't
+exist when you last stowed has no symlink yet:
+
+| What the pull changed | Action |
+|---|---|
+| Contents of an already-linked file (`settings.json`, `.zshrc`, `init.lua`) | **Nothing.** The symlink points into the repo, so new content is live immediately. |
+| A **new** file (new command/hook/skill, new package) | **Restow.** No symlink exists for it yet. |
+| A **deleted** file | **Restow.** Otherwise a dangling symlink is left behind; `stow -R` removes it. |
+
+This bites the `claude` package hardest: `--no-folding` gives every command, hook, and skill
+its own symlink, and it's the package that gains files most often. A pull that adds a slash
+command looks like it did nothing until you restow.
+
+So the safe habit is:
+```bash
+git pull && ./setup.sh
+```
+
+`setup.sh` is idempotent (it restows) and also applies package-list changes. On Fedora it
+runs `sudo dnf install`, so it'll ask for a password — to only refresh the symlinks:
+```bash
+git pull && stow -R -t ~ shell nvim ghostty vim && stow -R --no-folding -t ~ claude
+```
+
+Two things no restow can do, because they're outside Stow's job:
+
+- **`nvim/lazy-lock.json`** — the symlink updates, but installed plugin versions don't. Run
+  `:Lazy restore` in nvim to pin to the pulled lockfile.
+- **`mac/Brewfile` / `fedora/packages.txt`** — new packages still need `brew bundle
+  --file=mac/Brewfile` or the dnf install. `./setup.sh` covers both; the stow-only command
+  above does not.
+
 ## Updating package lists
 
 After installing new packages, export the updated list:
