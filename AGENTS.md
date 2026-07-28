@@ -70,11 +70,13 @@ dnf repoquery --userinstalled --qf '%{name}' | sort > fedora/packages.txt
 
 Beyond dotfiles, this repo carries tooling for the `~/workdir/repos` agent workflow:
 
-- **`templates/`** — canonical `AGENTS.md.tmpl` + `CLAUDE.md.tmpl` for a new project repo.
-- **`scripts/new-repo.sh <dir>`** — scaffolds those two files into a new repo (filled
-  with its name) and prints the steps to wire it into the workspace meta-repo
-  (`repos/.gitignore` line + `repos/AGENTS.md` table row). Keeps every new project on
-  the standard agent-context shape.
+- **`templates/`** — canonical `AGENTS.md.tmpl` + `CLAUDE.md.tmpl` for a new project repo,
+  plus `docs-README.md.tmpl` + `decision.md.tmpl` for the standard `docs/` shape.
+- **`scripts/new-repo.sh <dir>`** — scaffolds those templates into a new repo (filled with
+  its name): `AGENTS.md`, `CLAUDE.md`, `docs/README.md`, `docs/decisions/TEMPLATE.md`. It
+  skips files that already exist, then prints the steps to wire the repo into the workspace
+  meta-repo (`repos/.gitignore` line + `repos/AGENTS.md` table row). Keeps every new project
+  on the standard agent-context shape.
 - **`claude/.claude/skills/`** — the versioned home for personal global Claude skills
   (see its `README.md`).
 

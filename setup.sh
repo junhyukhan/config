@@ -53,7 +53,7 @@ stow -R -t "$HOME" shell nvim ghostty vim
 # claude uses --no-folding so ~/.claude stays a REAL directory with per-file
 # symlinks. Without it, stow folds the whole ~/.claude into one symlink and
 # Claude Code's runtime state (sessions, jobs, logs...) gets written into the
-# repo. See "Restowing / moving the repo" in README.md.
+# repo. See "`claude` package uses --no-folding" in AGENTS.md.
 stow -R --no-folding -t "$HOME" claude
 
 # cloudflared is only used on Fedora

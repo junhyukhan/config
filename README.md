@@ -8,24 +8,32 @@ Personal dotfiles for macOS and Fedora Linux, managed with [GNU Stow](https://ww
 config/
 ├── setup.sh                 # Bootstrap script (packages + symlinks)
 ├── shell/
-│   └── .zshrc               # -> ~/.zshrc
+│   ├── .zshrc               # -> ~/.zshrc
+│   └── .p10k.zsh            # -> ~/.p10k.zsh
 ├── nvim/
 │   └── .config/nvim/
-│       └── init.lua          # -> ~/.config/nvim/init.lua
+│       ├── init.lua          # -> ~/.config/nvim/init.lua
+│       └── lazy-lock.json    # -> ~/.config/nvim/lazy-lock.json
 ├── ghostty/
 │   └── .config/ghostty/
 │       └── config            # -> ~/.config/ghostty/config
 ├── vim/
 │   └── .vimrc               # -> ~/.vimrc
-├── claude/
+├── claude/                   # Agent config (stowed with --no-folding)
 │   └── .claude/
 │       ├── settings.json     # -> ~/.claude/settings.json
-│       └── commands/
-│           ├── pr.md               # -> ~/.claude/commands/pr.md
-│           └── cloudflare-tunnel.md # -> ~/.claude/commands/cloudflare-tunnel.md
+│       ├── AGENTS.md         # -> ~/.claude/AGENTS.md  (global agent instructions)
+│       ├── CLAUDE.md         # -> ~/.claude/CLAUDE.md  (thin @AGENTS.md import)
+│       ├── commands/         # -> ~/.claude/commands/   (slash commands)
+│       ├── hooks/            # -> ~/.claude/hooks/      (e.g. guard-secret-env.py)
+│       └── skills/           # -> ~/.claude/skills/     (global skills)
 ├── cloudflared/
 │   └── .cloudflared/
 │       └── config.yml        # -> ~/.cloudflared/config.yml (dev gateway only)
+├── templates/                # AGENTS/CLAUDE/docs templates for a new repo
+├── scripts/
+│   └── new-repo.sh           # Scaffold those templates into a new repo
+├── docs/                     # This repo's own docs (status + decisions)
 ├── legacy/
 │   └── karabiner/            # Retired configs (not linked)
 │       └── .config/karabiner/
@@ -36,7 +44,14 @@ config/
     └── packages.txt          # dnf packages
 ```
 
+Only `shell`, `nvim`, `ghostty`, `vim`, `claude`, and `cloudflared` are stow packages —
+`templates/`, `scripts/`, `docs/`, `legacy/`, `mac/`, and `fedora/` are never linked.
+
 ## Quick Start
+
+The canonical location is `~/workdir/repos/config` — one repo inside the `~/workdir/repos`
+workspace. Stow links are relative, so any other path works too; just re-run `./setup.sh`
+from wherever you cloned it (see [Moving the repo](#moving-the-repo)).
 
 ### macOS
 
@@ -47,16 +62,16 @@ config/
 
 2. Clone and set up:
    ```bash
-   git clone https://github.com/junhyukhan/config.git ~/dev/config
-   cd ~/dev/config
+   git clone https://github.com/junhyukhan/config.git ~/workdir/repos/config
+   cd ~/workdir/repos/config
    ./setup.sh
    ```
 
 ### Fedora
 
 ```bash
-git clone https://github.com/junhyukhan/config.git ~/dev/config
-cd ~/dev/config
+git clone https://github.com/junhyukhan/config.git ~/workdir/repos/config
+cd ~/workdir/repos/config
 ./setup.sh
 ```
 
@@ -90,8 +105,12 @@ cd /new/path/to/config
 GNU Stow creates symlinks from `$HOME` into this repo. When you edit `~/.config/nvim/init.lua`, you're editing the repo file directly -- no sync step needed.
 
 ```bash
-# Link a specific package
-stow -t ~ nvim
+# Link a specific package (-R = restow, idempotent)
+stow -R -t ~ nvim
+
+# The claude package MUST use --no-folding, or ~/.claude becomes a single
+# symlink and Claude Code's runtime state gets written into this repo.
+stow -R --no-folding -t ~ claude
 
 # Unlink a package
 stow -t ~ -D nvim
@@ -116,10 +135,11 @@ Then commit and push.
 | Config | Description |
 |--------|-------------|
 | **nvim** | Neovim config based on kickstart.nvim with LSP, Telescope, Treesitter |
-| **zsh** | Zsh with powerlevel10k, fzf, zoxide, syntax highlighting, autosuggestions |
+| **zsh** | Zsh with powerlevel10k (`.p10k.zsh`), fzf, zoxide, syntax highlighting, autosuggestions |
 | **ghostty** | Ghostty terminal emulator config |
 | **vim** | Basic vim config |
 | **Brewfile** | Homebrew packages and casks (macOS) |
 | **packages.txt** | dnf packages (Fedora) |
-| **claude** | Claude Code settings and custom slash commands |
+| **claude** | Claude Code agent config: `settings.json`, global `AGENTS.md`, slash commands, hooks, skills |
 | **cloudflared** | Dev gateway tunnel config (Fedora only, auto-stowed by setup.sh) |
+| **templates + scripts** | `new-repo.sh` scaffolds the standard `AGENTS.md` / `CLAUDE.md` / `docs/` into a new workspace repo |
