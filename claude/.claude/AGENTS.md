@@ -44,6 +44,29 @@ land it in git. Make the edits; leave committing and pushing to me (or to the ap
 session-end sync hook). "It was on the permission allowlist" is not "it should have been run" —
 *allowed ≠ should*.
 
+**One narrow carve-out — the `chore` class is a standing ask.** Amended 2026-07-29 (see
+`repos/docs/decisions/agent-ops.md`). My own words:
+
+> for trivial, docs only, chore commits, i usually tell the agent to commit directly to main and
+> push. For other feature based changes, i usually create docs, make and capture decisions, have the
+> agent implement, create a pr, review, and merge.
+
+A change is a `chore` only when **all** of these hold:
+
+- **Docs-only, no behavior change** — prose, comments, links, formatting, regenerated `journal/`
+  files. Not source, not config that changes what anything does at runtime.
+- **The repo's verifier is green** (or there is nothing to verify).
+- **The working tree was otherwise clean** — nothing unrelated gets swept into the commit.
+- **It's something I'd call a chore out loud**: typo, stale ref, dead link, regenerated output.
+
+Anything else keeps the rule above, unchanged. Still ask first for: any source-file change, anything
+under `quant/` (real-money API, no sandbox — see its `constitution.md`), anything creating standing
+config or automation, force-push, and branch deletion. `feature`-shaped work stops at **branch + PR**
+and waits for my review — it never merges itself.
+
+**When in doubt it is not a chore.** The carve-out is deliberately narrow so it can't be stretched;
+"this is basically docs" is a sign to ask, not to proceed.
+
 **Just do it** (no pre-check) for the reversible, single-obvious-answer things: typos, stale
 refs, searches, reading, running tests, local edits I can undo. **Ask first** for: design forks,
 outward-facing or hard-to-reverse actions (commit, push, send, publish, delete, deploy), and
