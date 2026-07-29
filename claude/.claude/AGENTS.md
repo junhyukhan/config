@@ -49,3 +49,24 @@ refs, searches, reading, running tests, local edits I can undo. **Ask first** fo
 outward-facing or hard-to-reverse actions (commit, push, send, publish, delete, deploy), and
 anything that creates standing config or automation. When in doubt, ask — it's cheap; a wrong
 autonomous commit/push is not.
+
+## Verify against the artifact, not a summary of it
+
+**A summarized read of a source is a lead, not a fact.** Before recording something as true — in a
+doc, a knowledge card, code, or a claim to me — go to the actual artifact: fetch the spec and grep
+it, open the file, run the query. Summaries of large documents drop things, and what they drop is
+invisible precisely because the summary reads as complete.
+
+This bites hardest on **absence**. "The docs don't mention X" from a summarizer usually means the
+summarizer didn't mention X. (Real case: a summarized read of a vendor's `openapi.json` reported an
+endpoint didn't exist; it was right there in `paths`, and a cost model was nearly built around the
+false absence.)
+
+Two corollaries:
+
+- **Transcribe whole tables, or say which rows you took.** A partial transcription formatted as if
+  complete is worse than none — nobody re-checks it.
+- **"The vendor's docs are wrong" deserves more scepticism than believing them**, not less. It's
+  the most flattering explanation for a discrepancy because it puts the error outside your own
+  code. Before concluding it, ask what would have to be true about *our* code for the docs to be
+  right — that story is usually the correct one.
