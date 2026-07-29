@@ -1,3 +1,12 @@
+---
+workspace:
+  readfirst: docs/README.md
+  decisions: docs/decisions/
+  backlog: []
+  verify: stow -n -R -t "$HOME" shell nvim ghostty vim && stow -n -R --no-folding -t "$HOME" claude
+  autonomy: chore
+---
+
 # AGENTS.md — config
 
 Guidance for any coding agent working in this repository.
