@@ -25,3 +25,17 @@ Relay the printed summary — which repos were pushed, and any `! <repo>: …` l
 to resolve it). The same summary is appended to `~/.claude/repo-sync.log`
 (`tail ~/.claude/repo-sync.log` for history). Exit code is 1 if anything needs
 attention, 0 otherwise.
+
+## Cleanup — offer, don't delete
+The run ends with a `cleanup — N branch(es) fully merged into main` section.
+**Offer to delete them; never delete unasked** — branch deletion is on the
+ask-first list in the global `AGENTS.md`. This step exists because merged
+branches were previously only found by manual audit, months late, and the noise
+they made is what hid a real unmerged branch. Han's framing: *"i usually end my
+feature implementation sessions with a '… push and the cleanup …' I feel like
+this should've been a part of that."*
+
+A branch that is **not** merged is a different thing — it may be unreclaimed
+work. Don't sweep it; surface it and let him decide, and if it's being dropped,
+run `decide` so the reasoning exists somewhere other than a dangling branch.
+Rationale: `~/workdir/repos/docs/decisions/git-workflow.md`.

@@ -181,6 +181,21 @@ def notify_discord(problems):
         pass  # alert is best-effort; the log + stdout still have the record
 
 
+def merged_branches(root):
+    """Local branches fully merged into main — reported, never deleted.
+
+    Cleanup belongs to session end rather than to an occasional audit: a stale branch
+    is either unreclaimed work or noise that hides unreclaimed work, and it was the
+    seven merged ones that kept a five-month-old unmerged branch invisible. Reporting
+    is read-only on purpose — branch deletion stays on the ask-first list in the
+    global AGENTS.md. See repos/docs/decisions/git-workflow.md.
+    """
+    r = git(root, "branch", "--merged", "main", "--format=%(refname:short)")
+    if r.returncode != 0:
+        return []
+    return [b for b in r.stdout.split() if b != "main"]
+
+
 def main():
     if not REPOS_ROOT.is_dir():
         print(f"repos-sync: no workspace at {REPOS_ROOT}")
@@ -207,6 +222,17 @@ def main():
         print(f"  ! {name}: {outcome}  (needs a manual look)")
     if not pushed and not problems:
         print("  everything already in sync.")
+
+    stale = []
+    for repo in find_repos(REPOS_ROOT):
+        for branch in merged_branches(repo):
+            stale.append((os.path.relpath(repo, REPOS_ROOT), branch))
+    if stale:
+        print(f"\ncleanup — {len(stale)} branch(es) fully merged into main:")
+        for name, branch in stale:
+            print(f"  {name}: {branch}")
+        print("  (reported only — deleting is Han's call)")
+
     return 1 if problems else 0
 
 
