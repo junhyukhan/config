@@ -27,7 +27,11 @@ to resolve it). The same summary is appended to `~/.claude/repo-sync.log`
 attention, 0 otherwise.
 
 ## Cleanup — offer, don't delete
-The run ends with a `cleanup — N branch(es) fully merged into main` section.
+The run ends with a `cleanup — N branch(es) fully landed in main` section. It detects
+**both** real merges (by ancestry) and **squash-merges** (by patch-id against the
+merge-base) — the workspace squashes by default, and an ancestry-only check reports
+nothing forever under that rule. Squashed branches are labelled, because they need
+`git branch -D`; `-d` refuses them.
 **Offer to delete them; never delete unasked** — branch deletion is on the
 ask-first list in the global `AGENTS.md`. This step exists because merged
 branches were previously only found by manual audit, months late, and the noise

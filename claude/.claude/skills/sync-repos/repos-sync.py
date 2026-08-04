@@ -181,19 +181,72 @@ def notify_discord(problems):
         pass  # alert is best-effort; the log + stdout still have the record
 
 
+def squash_merged(root, branch, base="main"):
+    """True if `branch`'s whole diff is already in `base` as a squashed commit.
+
+    `git branch --merged` walks ancestry, and a squash-merge creates a NEW commit
+    with a new hash — the branch's own commits never become ancestors of main. So
+    under this workspace's squash-merge rule (repos/docs/decisions/git-workflow.md)
+    ancestry-based detection reports *nothing*, forever, which is exactly the
+    "merged branches found months late by manual audit" failure the cleanup step
+    was added to prevent. Measured 2026-08-04: duri-v3's `feat/raw-ingestions-seam`
+    was squash-merged and the sweep reported zero merged branches.
+
+    The test that does work: rebuild the branch's entire diff against its merge-base
+    as ONE synthetic commit, then ask `git cherry` whether that patch is already in
+    base. A squash commit has precisely that patch, so its patch-id matches and
+    cherry marks it `-` (already upstream). This is content equality, not ancestry,
+    which is the right question for a squash.
+
+    Side effect, deliberate and harmless: `commit-tree` writes one dangling object
+    into the repo's object store. It is unreachable and `git gc` prunes it; nothing
+    references it and no ref moves. That is the cost of asking this question
+    locally, without a network round-trip to the forge.
+    """
+    mb = git(root, "merge-base", base, branch)
+    tree = git(root, "rev-parse", f"{branch}^{{tree}}")
+    if mb.returncode != 0 or tree.returncode != 0:
+        return False
+    mb, tree = mb.stdout.strip(), tree.stdout.strip()
+    if not mb or not tree:
+        return False
+    synth = git(root, "commit-tree", tree, "-p", mb, "-m", "squash-probe")
+    if synth.returncode != 0 or not synth.stdout.strip():
+        return False
+    r = git(root, "cherry", base, synth.stdout.strip())
+    # `-` = patch already upstream; `+` = not present.
+    return r.returncode == 0 and r.stdout.strip().startswith("-")
+
+
 def merged_branches(root):
-    """Local branches fully merged into main — reported, never deleted.
+    """Local branches fully landed in main — reported, never deleted.
 
     Cleanup belongs to session end rather than to an occasional audit: a stale branch
     is either unreclaimed work or noise that hides unreclaimed work, and it was the
     seven merged ones that kept a five-month-old unmerged branch invisible. Reporting
     is read-only on purpose — branch deletion stays on the ask-first list in the
     global AGENTS.md. See repos/docs/decisions/git-workflow.md.
+
+    Two ways a branch can have landed, and both must be checked: ancestry (a real
+    merge or fast-forward) and content (a squash — see squash_merged).
     """
-    r = git(root, "branch", "--merged", "main", "--format=%(refname:short)")
-    if r.returncode != 0:
+    listed = git(root, "branch", "--format=%(refname:short)")
+    if listed.returncode != 0:
         return []
-    return [b for b in r.stdout.split() if b != "main"]
+    branches = [b for b in listed.stdout.split() if b != "main"]
+    if not branches:
+        return []
+
+    ancestry = git(root, "branch", "--merged", "main", "--format=%(refname:short)")
+    merged = {b for b in ancestry.stdout.split() if b != "main"} if ancestry.returncode == 0 else set()
+
+    out = []
+    for b in branches:
+        if b in merged:
+            out.append((b, "merged"))
+        elif squash_merged(root, b):
+            out.append((b, "squashed"))
+    return out
 
 
 def main():
@@ -225,12 +278,15 @@ def main():
 
     stale = []
     for repo in find_repos(REPOS_ROOT):
-        for branch in merged_branches(repo):
-            stale.append((os.path.relpath(repo, REPOS_ROOT), branch))
+        for branch, how in merged_branches(repo):
+            stale.append((os.path.relpath(repo, REPOS_ROOT), branch, how))
     if stale:
-        print(f"\ncleanup — {len(stale)} branch(es) fully merged into main:")
-        for name, branch in stale:
-            print(f"  {name}: {branch}")
+        print(f"\ncleanup — {len(stale)} branch(es) fully landed in main:")
+        for name, branch, how in stale:
+            # Name the mechanism: a squashed branch needs `git branch -D`, because
+            # `-d` refuses it — git still considers it unmerged by ancestry.
+            note = "  (squash-merged — `-d` will refuse it, needs `-D`)" if how == "squashed" else ""
+            print(f"  {name}: {branch}{note}")
         print("  (reported only — deleting is Han's call)")
 
     return 1 if problems else 0
