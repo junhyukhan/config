@@ -48,14 +48,29 @@ independent layers:
    `create_branch` / `delete_branch` / `merge_branch` / `reset_branch` / `rebase_branch`,
    `create_project`, `pause_project`, `restore_project`, `update_storage_config`.
 
-**Known wart, not a hole:** all 20 tools are still *advertised* in `tools/list`, including the
+~~**Known wart, not a hole:** all 20 tools are still *advertised* in `tools/list`, including the
 mutating ones. They appear available and then refuse. Don't read their presence as the flag
-having failed.
+having failed.~~
+
+**⚠️ CORRECTED 2026-08-05 — that was true of the version probed on 2026-08-04 and is not a stable
+property.** In the version cached now (`0.9.0`), read-only mode takes a `readOnlyBehavior` option
+that defaults to **`'exclude'` — mutating tools are removed from the tool list entirely**, not
+advertised-then-refused. So the observable signature of the flag is version-dependent: sometimes
+the tools are absent, sometimes present and throwing. **`.mcp.json` pins `@latest`**, so this can
+change again under any session without a config edit. Don't treat either signature as the test of
+whether the flag is on — read the `args` in `.mcp.json`, which is the only thing that actually
+decides it.
 
 **The cost of this choice, stated plainly:** applying a migration to hosted through the MCP is
 **not possible** while the flag is set. That is the intended trade — hosted DDL stays a
-deliberate act (SQL editor, or a temporary run without the flag), not something a session can do
+deliberate act (SQL editor, or a run without the flag), not something a session can do
 in passing.
+
+**A launch flag is not an approval gate — the distinction that D3 turned on.** `--read-only` is
+fixed for the life of the server process. A Claude Code permission prompt decides whether a call
+is *made*; it cannot change what an already-running server *accepts*. There is no "approve this
+one write" path while the flag is set: either the tool is absent, or it throws, or Postgres
+refuses under `transaction_read_only=on`. Changing it means editing `args` and restarting.
 
 ### D2 — pin `--project-ref`
 
@@ -93,6 +108,63 @@ are authenticated; revisit if the token ever gains broader scope than one org.
 
 ### Open
 
-The wrong diagnosis still sits in `duri-v3/build/progress.md` and `docs/07` — both say the SQL
+~~The wrong diagnosis still sits in `duri-v3/build/progress.md` and `docs/07` — both say the SQL
 editor is the only path to hosted DDL, for a reason that turned out to be false. Correcting it is
-`duri-v3`'s to make, not this repo's.
+`duri-v3`'s to make, not this repo's.~~ **Closed 2026-08-05** — corrected in `duri-v3` (commit on
+`feat/voice-parse-seam`), in the repo that owns those files.
+
+## Amendment 2026-08-05 — D3: `--read-only` removed
+
+**This supersedes D1's flag choice. D1's *reasoning* is left intact above** — it is why the flag
+was there, and it is the argument to re-read before deciding whether it goes back.
+
+### The ask (verbatim)
+
+The amendment started from a correction Han made to a claim of mine — that the MCP could only
+inspect hosted, never migrate it:
+
+> **Verbatim (2026-08-05):** "Yes the mcp is read only by default. But it can write on my approval."
+
+**That premise is wrong as configured, and the wrongness is the point.** There was no approval path:
+`--read-only` is a launch argument, so no permission prompt could have unlocked a write (see the
+paragraph added under D1). The belief is an easy one to hold — Claude Code *does* prompt before MCP
+calls, so "it'll ask me first" generalises naturally — and it is exactly the kind of belief that
+looks harmless until the write silently doesn't happen, or until someone counts on the prompt as
+the safety mechanism when it isn't one. Shown the mechanism, Han chose to change the config rather
+than the expectation:
+
+> **Verbatim (2026-08-05):** "Yes and yes to removing the readonly"
+>
+> **Verbatim (2026-08-05):** "Fix all of them, push and clean up so that we can start a new session
+> right away"
+
+("Yes and yes" = fix the stale `tools/list` paragraph, **and** remove the flag.)
+
+### Discussion
+
+**The forcing reason:** duri-v3 migration `0021` must reach hosted before PR #43 deploys, and both
+deploy targets share one Supabase project. The two available paths were the Supabase SQL editor or
+an MCP run without the flag. The MCP path is materially better for this specific job: `apply_migration`
+both applies the DDL **and** records the row in `supabase_migrations.schema_migrations` — the two
+steps that were hand-stitched for `0018` and drifted as a result.
+
+**What is now true, stated plainly rather than buried:** every future session launched at
+`~/workdir/repos` gets `execute_sql` **write** access to the live household-finance database,
+ambiently. That is precisely the exposure D1 declined, and `duri-v3/docs/07`'s "never let a cloud
+agent autonomously mutate prod data for a money app" now rests on session discipline rather than on
+the flag. Han's call, made with the tradeoff in front of him.
+
+**Scope of the removal was NOT settled and is the open question below.** The path originally put to
+Han was "drop the flag, apply, put it back"; what he asked for and what is committed here is the
+flag simply removed, because the follow-up asked for a pushed, clean state to start a new session
+from — which means the config had to land in its write-capable form. Whether it goes back after
+`0021` is his to decide, and is deliberately not decided here.
+
+### Open
+
+- **Does `--read-only` go back after `0021` is applied?** Restoring it is a one-line revert of this
+  commit. Leaving it off is a standing grant, so the default answer should be "restore it" and the
+  burden of argument is on keeping it off. **Not decided.**
+- **Nothing enforces the restore.** No hook, reminder, or check will notice the flag is absent —
+  this bullet is the only record. If the answer above is "restore it", that wants a mechanism, not
+  a note.

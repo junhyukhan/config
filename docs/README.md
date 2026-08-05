@@ -24,8 +24,9 @@ stays Han's call).
     artifact" stays a disposition in `AGENTS.md`, with concrete checks at their points of use.
   - [`decisions/grill-and-decide-skills.md`](decisions/grill-and-decide-skills.md) — what was
     absorbed from `mattpocock/skills`, what was left, and why it became two skills.
-  - [`decisions/supabase-mcp.md`](decisions/supabase-mcp.md) — read-only + project-pinned Supabase
-    MCP: what `--read-only` actually enforces, and why the token lives in `.zshrc`, not `.mcp.json`.
+  - [`decisions/supabase-mcp.md`](decisions/supabase-mcp.md) — project-pinned Supabase MCP: what
+    `--read-only` enforced, why the token lives in `.zshrc` not `.mcp.json`, and **D3 (2026-08-05):
+    the flag removed, so the server can now write to hosted**.
 
 <!-- Add state singletons here as the repo grows — one file each, rewritten in place:
 - **`roadmap.md`** — phases / what's planned
