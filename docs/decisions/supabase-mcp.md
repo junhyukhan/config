@@ -327,12 +327,14 @@ before, and it does so with the flag on.
 
 ### Still open
 
-- **Nothing enforces any of this.** D3's open bullet — *"No hook, reminder, or check will notice the
-  flag is absent"* — is unchanged, and now covers the flag, the `.zshenv` export, and the skill.
-  A check in `repos/ops/index.py` would cover all three; a bullet in a document covers none.
-  **My judgment, not Han's:** this is the weakest part of the arrangement, because every item
-  degrades *silently* — the flag going missing looks like nothing, and the export going missing
-  looks like an unrelated connection error, which is exactly how this round was lost.
+- ~~**Nothing enforces any of this.**~~ **CLOSED 2026-08-06** — D3's long-standing open bullet
+  (*"No hook, reminder, or check will notice the flag is absent"*) is answered. All three items are
+  now in `GUARDED_CONFIG` in `repos/ops/index.py`, plus a fourth **regression** guard that fires if
+  the PAT export is ever put back into `.zshrc`. Each was verified by breaking it and watching the
+  check fire by name. Record: `repos/docs/decisions/agent-ops.md` § "the `guarded config` check".
+  **Residual, and it is real:** nothing *runs* the checker automatically, so the guards help only on
+  a run. That is now the highest-value item in the agent-ops sequencing list rather than a nice-to-
+  have, because these checks are no longer purely informational.
 - **`--read-only`'s observable signature is still version-dependent** and `.mcp.json` still pins
   `@latest` (see D1's 2026-08-05 correction). The `args` remain the only reliable test that the flag
   is on. Unresolved by this amendment, and an argument for pinning a version that was not made.
