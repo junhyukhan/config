@@ -168,3 +168,171 @@ from — which means the config had to land in its write-capable form. Whether i
 - **Nothing enforces the restore.** No hook, reminder, or check will notice the flag is absent —
   this bullet is the only record. If the answer above is "restore it", that wants a mechanism, not
   a note.
+
+## Amendment 2026-08-06 — D4: `--read-only` restored; the CLI becomes the write path
+
+**This closes D3's open question** (*"does `--read-only` go back after `0021` is applied?"*) and
+supersedes D3's flag choice. **D3's reasoning stays intact above** — it is why the flag came off,
+and the forcing reason it names (get `0021` onto hosted) was real and is now discharged.
+
+### The ask (verbatim)
+
+The amendment opened as a push-back on a recommendation of mine to restore the flag:
+
+> **Verbatim (2026-08-06):** "Hmm yeah the mcp was useless this round but i want to push back on
+> your decision to remove the flag. And i want to ask whether using the cli or mcp is the better
+> path forward when using a coding agent. My presumption is that a cli should be used if i want to
+> manually control it myself. But since i want the agent to control it, i should either use an mcp
+> or a skill that lists the commands. I feel like mcp is the better choice. As long as i get a
+> confirmation for the writes, that should be fine no?"
+
+Then, correcting his own wording and widening the question — this is the pivot of the whole
+amendment:
+
+> **Verbatim (2026-08-06):** "Ah yeah i made a typo. I meant i want to push back on restoring the
+> readonly flag for the mcp
+>
+> But then i have a more fundamental question. Why even use an mcp if i can just use a skill + cli
+> combo?
+>
+> And btw i just havent got the chance to add the credentials for the mcp yet. I will later once we
+> decide our path."
+
+Two questions that caught errors in my answers, in order:
+
+> **Verbatim (2026-08-06):** "Wait i dont get it. The supabase cli doesnt do sql execute is what
+> you're saying? Then how would a read only mcp help. What gap is this readonly mcp"
+
+> **Verbatim (2026-08-06):** "Wait so how did you apply the migration sql this session?"
+
+And the decision:
+
+> **Verbatim (2026-08-06):** "Let's go with B, write the decision record"
+
+### Discussion
+
+**What was decided — option B of three offered.** The MCP is restored to `--read-only`; **the
+Supabase CLI becomes the write path for hosted**, driven by the agent, wrapped in a skill so the
+commands and traps are not rediscovered each session. The two tools are assigned by *direction*,
+not by who is typing.
+
+| | writes | reads (query, rows back) |
+|---|---|---|
+| CLI | ✅ — but only SQL that exists as a **tracked migration file** | ❌ none |
+| MCP `--read-only` | ❌ (`transaction_read_only=on`) | ✅ arbitrary |
+| MCP unrestricted | ✅ arbitrary | ✅ arbitrary |
+
+**Options rejected:**
+
+- **A — skill + CLI, drop the MCP entirely**, filling read-back with a small committed
+  `postgres.js` script (the `duri-v3/scripts/check-hosted-migrations.mjs` pattern). Genuinely
+  defensible and nearly chosen; rejected as less ergonomic than a tool that already exists and
+  works. **The cost of not choosing it:** a standing MCP server, pinned `@latest`, whose behaviour
+  has already changed under this workspace once (see D1's 2026-08-05 correction).
+- **C — keep the MCP unrestricted, rely on per-write confirmation.** This was Han's opening
+  position and it is *mechanically coherent* — unlike the 2026-08-05 belief D3 corrected, where the
+  flag was **on** and no prompt could unlock a write. With the flag off, the permission prompt is a
+  real gate. It was rejected on what the prompt is worth in practice, not on principle: as
+  configured, `config/claude/.claude/settings.json` sets `defaultMode: auto` with **no `allow`,
+  `ask`, or `deny` entries at all**, so "I confirm the writes" rests on a classifier's judgment per
+  invocation rather than a rule Han wrote. It also degrades silently in non-interactive contexts
+  (cloud agents, `/loop`, background runs), which is the exposure `duri-v3/docs/07` names outright:
+  *"Never let a cloud agent autonomously mutate prod data for a money app."*
+
+**The argument that actually decided it, and it is not a safety argument.** The first case I made
+for restoring the flag was about review surface — a migration file goes through a PR, an in-session
+SQL string does not. True, and it still holds (constitution #2 and #3 in `duri-v3` are enforced by
+*reviewed migration files*). But it framed the flag as a restriction Han had to accept. The better
+argument, reached only after his second "wait", is that **the tools do not overlap**: the CLI
+writes, the MCP reads, and neither can do the other's half. Restoring `--read-only` therefore costs
+nothing — writes are not the MCP's job any more — rather than trading ergonomics for safety. The
+flag stopped being contested once the question stopped being about permission.
+
+**Two claims of mine were wrong and were corrected by Han's questions. Recorded because a
+correction that lives only in chat gets re-derived wrong.**
+
+1. **"The CLI has no SQL execution at all, in either direction" — false.** `npx supabase migration
+   up --linked` executed the whole of `0021` against production this session. What the CLI lacks is
+   *arbitrary* execution: there is no `supabase db execute "SELECT …"`. Verified against
+   `npx supabase db --help`, whose subcommands are exactly `diff | dump | push | pull | reset |
+   lint`. The gap is **read-back**, not execution — the agent can change hosted but cannot ask it a
+   question.
+2. **"CLI = manual control, MCP = agent control"** (Han's framing, and I initially answered inside
+   it before challenging it) **is not the real axis.** The CLI was driven *by the agent* this
+   session, gated by a Bash permission prompt exactly as an MCP call would be. Both paths are
+   agent-drivable and both are confirmable; the difference is what the artifact is.
+
+**The concrete gap, from this session rather than in the abstract.** Applying `0021` worked;
+**verifying it did not**. After the migration landed, the `REVOKE UPDATE, DELETE, TRUNCATE` and the
+creator-scoped RLS policy could not be checked directly on hosted — their effect was *inferred*
+from `supabase db diff --linked` showing the table present. For a money app whose constitution #2
+turns on "RLS is actually on, on *this* database", inference is the wrong strength of evidence, and
+`0021`'s own header says why: default privileges are configured **per database**, so a privilege
+diff against local proves nothing about hosted. That is the job the read-only MCP is being kept for.
+
+**A premise to retire: the MCP's founding justification does not survive.** D1 adopted it partly
+because hosted Postgres was unreachable from an agent shell — `db.<ref>.supabase.co` is IPv6-only,
+this machine has no IPv6 egress. This record already carried the correction that the session-mode
+pooler is reachable over IPv4 and *was never tried*; this session settled it, with the CLI reaching
+hosted and applying `0021` with none of that trouble. The MCP was adopted to route around a wall
+that had a door in it. It is being kept for a different and narrower reason than the one it arrived
+with, and that should be visible rather than buried.
+
+**Han's belief that credentials are still missing is false — do not act on it.** The closing
+verbatim says *"i just havent got the chance to add the credentials for the mcp yet."* Nothing needs
+adding: `~/.supabase/access-token` exists (44 bytes, dated 17 Jul 2026), `shell/.zshrc:33-34`
+bridges it into the environment, and `claude mcp list` run from an **interactive** shell reports
+`supabase … ✔ Connected`. Verified this session.
+
+**Why it looked broken, and the one real defect this uncovered.** `.zshrc` is sourced for
+**interactive** shells only, and there is no `~/.zshenv`. Claude Code spawns MCP servers as
+non-interactive children, so the export never runs and the server starts with no PAT and exits —
+surfacing as `✘ Connection closed`. Measured, not inferred:
+
+```
+zsh -c   (non-interactive)  → SUPABASE_ACCESS_TOKEN NOT SET   → mcp: ✘ Connection closed
+zsh -ic  (interactive)      → set (44 chars)                  → mcp: ✔ Connected
+```
+
+**The fix is to move the export from `shell/.zshrc` to a new `~/.zshenv`** (a `shell` stow package
+file), which zsh sources for every invocation regardless of interactivity. **Not yet done — it is
+its own change and creates a new stowed file.** Until it is, the MCP works only when Claude Code
+inherits an interactive environment, which is a coin-flip depending on how the session was launched.
+This is the defect that made the MCP *"useless this round"*, and it is unrelated to the flag.
+
+### As implemented — 2026-08-06, all three landed
+
+- **`--read-only` restored** in `repos/.mcp.json`.
+- **The token export moved** from `shell/.zshrc` to a new stowed `shell/.zshenv`, and stowed
+  (`~/.zshenv` → `config/shell/.zshenv`). `.zshrc` keeps a pointer comment so the move is not
+  re-litigated. **Accepted cost, stated in the file:** the PAT is now exported into every zsh
+  process rather than only interactive ones — the same exposure through a wider door, and the price
+  of the MCP working regardless of how a session was launched.
+- **`duri-v3/.claude/skills/supabase-hosted/`** written, carrying the traps a tool schema cannot
+  express. It is a **new** skill rather than an extension of `db-type-contract` because that one
+  owns the schema↔types contract and the *local* apply, and this repo's `AGENTS.md` says skills are
+  "one concern each". The two now cross-reference, and `db-type-contract` step 4 was corrected to
+  `migration up --local` — it previously read bare `migration up`, which silently means local.
+
+**Verified, not assumed** — the two failure modes this amendment exists to fix were both re-tested
+after the change:
+
+```
+zsh -c 'claude mcp list'   → supabase … --read-only … ✔ Connected
+zsh -c   (non-interactive) → SUPABASE_ACCESS_TOKEN set (44 chars)
+```
+
+The server now connects from a **non-interactive** shell, which is precisely what it could not do
+before, and it does so with the flag on.
+
+### Still open
+
+- **Nothing enforces any of this.** D3's open bullet — *"No hook, reminder, or check will notice the
+  flag is absent"* — is unchanged, and now covers the flag, the `.zshenv` export, and the skill.
+  A check in `repos/ops/index.py` would cover all three; a bullet in a document covers none.
+  **My judgment, not Han's:** this is the weakest part of the arrangement, because every item
+  degrades *silently* — the flag going missing looks like nothing, and the export going missing
+  looks like an unrelated connection error, which is exactly how this round was lost.
+- **`--read-only`'s observable signature is still version-dependent** and `.mcp.json` still pins
+  `@latest` (see D1's 2026-08-05 correction). The `args` remain the only reliable test that the flag
+  is on. Unresolved by this amendment, and an argument for pinning a version that was not made.

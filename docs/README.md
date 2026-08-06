@@ -25,8 +25,9 @@ stays Han's call).
   - [`decisions/grill-and-decide-skills.md`](decisions/grill-and-decide-skills.md) — what was
     absorbed from `mattpocock/skills`, what was left, and why it became two skills.
   - [`decisions/supabase-mcp.md`](decisions/supabase-mcp.md) — project-pinned Supabase MCP: what
-    `--read-only` enforced, why the token lives in `.zshrc` not `.mcp.json`, and **D3 (2026-08-05):
-    the flag removed, so the server can now write to hosted**.
+    `--read-only` enforced, why the token lives in `.zshrc` not `.mcp.json`, and **D4 (2026-08-06):
+    the flag goes back on and the CLI becomes the write path** — the two tools split by direction
+    (CLI writes, from reviewed migration files; MCP reads, arbitrary), superseding D3's removal.
 
 <!-- Add state singletons here as the repo grows — one file each, rewritten in place:
 - **`roadmap.md`** — phases / what's planned

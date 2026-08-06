@@ -54,6 +54,13 @@ dnf repoquery --userinstalled --qf '%{name}' | sort > fedora/packages.txt
 
 **Cross-platform zshrc**: OS detection at the top of `.zshrc` sets plugin/theme paths per platform. macOS uses Homebrew paths, Fedora uses `/usr/share/` and `~/powerlevel10k/`.
 
+**`.zshenv` vs `.zshrc` — the split matters and has bitten once.** `.zshrc` is sourced for
+**interactive** shells only; `.zshenv` for **every** zsh, including the non-interactive children
+that Claude Code spawns MCP servers as. Anything an agent-launched process must see (env exports
+like `SUPABASE_ACCESS_TOKEN`) belongs in `.zshenv`; everything interactive — prompt, plugins,
+aliases, completions — stays in `.zshrc`. Putting the Supabase PAT in `.zshrc` made the MCP fail
+with `✘ Connection closed` while the credentials were fine (`docs/decisions/supabase-mcp.md`, D4).
+
 **Package management**:
 - macOS: `mac/Brewfile` with `brew bundle`
 - Fedora: `fedora/packages.txt` with `dnf install`
@@ -62,7 +69,7 @@ dnf repoquery --userinstalled --qf '%{name}' | sort > fedora/packages.txt
 
 | Package | Symlink Created |
 |---------|----------------|
-| shell | `~/.zshrc`, `~/.p10k.zsh` |
+| shell | `~/.zshrc`, `~/.zshenv`, `~/.p10k.zsh` |
 | nvim | `~/.config/nvim/init.lua`, `~/.config/nvim/lazy-lock.json` |
 | ghostty | `~/.config/ghostty/config` |
 | vim | `~/.vimrc` |

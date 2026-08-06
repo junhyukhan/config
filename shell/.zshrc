@@ -25,13 +25,10 @@ export LC_ALL=en_US.UTF-8
 export EDITOR='nvim'
 export PATH="$HOME/.local/bin:$PATH"
 
-# Supabase MCP server (repos/.mcp.json) authenticates with a personal access
-# token. It reads SUPABASE_ACCESS_TOKEN from the environment and does NOT read
-# the Supabase CLI's own token file, so bridge the two here rather than putting
-# the value in .mcp.json — that file is committed, and a PAT is a secret.
-# No secret enters the repo: this reads a local file that git never sees.
-[ -r "$HOME/.supabase/access-token" ] && \
-    export SUPABASE_ACCESS_TOKEN="$(cat "$HOME/.supabase/access-token")"
+# SUPABASE_ACCESS_TOKEN moved to .zshenv (2026-08-06) — it must reach
+# NON-interactive shells too, which is where Claude Code spawns MCP servers.
+# .zshrc is interactive-only, so the export silently never ran for them.
+# See config/docs/decisions/supabase-mcp.md (D4).
 
 # Detect platform and set plugin/theme paths
 if [[ "$OSTYPE" == darwin* ]]; then
