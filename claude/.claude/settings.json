@@ -16,6 +16,18 @@
         ]
       }
     ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$HOME/.claude/hooks/format-on-edit.py\"",
+            "statusMessage": "Formatting edited file"
+          }
+        ]
+      }
+    ],
     "SessionStart": [
       {
         "hooks": [
