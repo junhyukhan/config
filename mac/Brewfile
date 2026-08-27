@@ -56,8 +56,6 @@ cask "alt-tab"
 cask "balenaetcher"
 # Web browser focusing on privacy
 cask "brave-browser"
-# Write, edit, and chat about your code with AI
-cask "cursor"
 # Universal database tool and SQL client
 cask "dbeaver-community"
 # Utilities designed to make common development tasks easier
@@ -80,8 +78,10 @@ cask "visual-studio-code"
 go "golang.org/x/tools/gopls"
 npm "pnpm"
 
-# VS Code extensions. `brew bundle dump` only captures these when the `code`
-# CLI is on PATH, so it silently drops them otherwise -- keep them by hand.
+# VS Code extensions -- a 2026-04-03 snapshot, NOT currently installed.
+# `brew bundle dump` emits only what `code --list-extensions` reports, and VS
+# Code now has none: the extensions in daily use live in Cursor, which Homebrew
+# Bundle has no directive for. Kept deliberately; see AGENTS.md.
 vscode "anthropic.claude-code"
 vscode "astro-build.astro-vscode"
 vscode "github.copilot-chat"

@@ -76,9 +76,18 @@ uninstall claude` removes it. Tracking it would mean owning a vendor file that g
 `setup.sh` installs herdr and its integration instead, which is what makes the tracked
 `settings.json` reference to that hook valid on a new machine.
 
-**`brew bundle dump` silently drops entries.** It omits `vscode "..."` lines unless the `code` CLI
-is on PATH, and it has dropped them before — verify with a set comparison, not by eyeballing the
-diff, and re-add by hand if needed.
+**`brew bundle dump` rewrites `vscode` entries from live state, so it can delete them.** It emits
+exactly what `code --list-extensions` reports. VS Code currently has **none** — the extensions in
+daily use are in **Cursor**, and Homebrew Bundle has no directive for Cursor, so `brew bundle`
+cannot capture or restore them. A dump therefore wipes the `vscode` block. Always verify a re-dump
+with a set comparison rather than eyeballing the diff:
+
+```bash
+comm -23 <(git show HEAD:mac/Brewfile | grep -E '^(tap|brew|cask|vscode|go|npm) ' | sort) \
+         <(grep -E '^(tap|brew|cask|vscode|go|npm) ' mac/Brewfile | sort)
+```
+
+Anything it prints was dropped.
 
 **Package management**:
 - macOS: `mac/Brewfile` with `brew bundle`
