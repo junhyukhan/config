@@ -1,26 +1,73 @@
 # Phone → agent interaction (iPhone as a first-class control surface)
 
-**Status:** in progress — paused 2026-08-13, resume at the trial below
+**Status:** in progress — **Herdr installed 2026-08-27**, trial not yet run
 
 ## Resume here
 
-Design is settled through the build-vs-adopt call; **nothing has been installed or changed on the
-machine.** No launcher was written, `~/.tmux.conf` is untouched (still the untracked 4-line file at
-`~`), `shell/.zshrc` is untouched.
+**Herdr v0.8.2 is installed** at `~/.local/bin/herdr` (on PATH). The binary was downloaded from the
+pinned GitHub release rather than by piping `install.sh`, and its SHA-256 was verified against
+`herdr.dev/latest.json`: `a5d4f4d5…f6ae574`, Mach-O arm64, 19 MB. Cross-check that the manifest is
+consistent: its `0.8.0` entry still reads `d53a9f93…c658178`, matching what this record verified on
+2026-08-12.
 
-**Next step:** trial Herdr on the Mac —
+`~/.tmux.conf` and `shell/.zshrc` are **still untouched**, and no launcher was written.
 
-```sh
-curl -fsSL https://herdr.dev/install.sh | sh   # → ~/.local/bin/herdr (already on PATH)
-```
+**A `herdr server` is running** (started incidentally by a `herdr status` call, not deliberately).
+`herdr server stop` ends it.
 
-The `v0.8.0` macOS arm64 binary's SHA-256 was verified against `herdr.dev/latest.json` on 2026-08-12
-(`d53a9f93…c658178`, Mach-O arm64, 17M, ad-hoc signed / **not notarized**). Antigravity is already on
-Han's PATH and got native session restore in that release, so the multi-harness claim is testable on
-day one without installing anything new.
+**Next step: run the trial.** Start `herdr`, run `claude rc` in a pane, and answer the open questions
+at the bottom — that is also when the tmux prefix question either revives or dies for good.
 
-Answer the open questions at the bottom during the trial, then the verdict goes here — that is also
-when the tmux prefix question either revives or dies for good.
+## What the 2026-08-27 session established
+
+**The phone goal was already met and this record did not know it.** `claude rc` — verified to be the
+same command as `claude remote-control`, `rc` is an alias — has been running on this machine for
+**3 days 7 hours** (PID 22235), and `~/.claude.json` records
+`remoteControlSurfacesSeen: ['mobile', 'desktop']`. Han had been driving sessions from the phone
+already. The assistant presented Remote Control as a finding; it was not one.
+
+**What Remote Control does not cover is the multi-harness goal** — it is Claude-only. That is the
+whole remaining case for a multiplexer, and it is the case this record was always about.
+
+### Why Herdr over cmux — the ask (verbatim)
+
+> **Verbatim (2026-08-27, the weight constraint):** "I do want to use a solution that is not too
+> heavy. For example a solution that uses electron (chromium) isnt my favorite unless its really well
+> made."
+
+> **Verbatim (2026-08-27, prior experience and the honest caveat):** "Btw claude code can now ping
+> other claude code sessions. Ive been using it with herdr at work which is nice. Though at work our
+> env is windows so that is not necessarily an argument for going with herdr."
+
+> **Verbatim (2026-08-27):** "Cross compatibility does sound great since i have a thinkpad … Rn i do
+> like the look of herdr"
+
+> **Verbatim (2026-08-27, the go-ahead):** "Yeah lets go with herdr."
+
+**cmux was evaluated and rejected on portability, not weight.** A summarized read would have had it
+dismissed as Electron; the README says otherwise — *"macOS only, for now. cmux is a native Swift +
+AppKit app."* It also has an **iOS app in beta** that pairs to the Mac, which is aimed squarely at
+Han's stated top pain (*"the key binds are a PITA on my iPhone"*). **What disqualifies it is
+macOS-only**, against a stated ThinkPad and a Windows work machine. Recorded this way so the
+rejection is not re-derived on the wrong grounds.
+
+Herdr, verified: `macOS · Linux · Windows` (native PowerShell installer), Rust, Apache-2.0,
+27k+ stars, single 19 MB binary, no Electron, no bundled browser, no hosted control plane, *"20
+agents detected out of the box"* including Claude Code and Codex. `herdr integration install claude`
+installs the built-in Claude Code integration; `herdr --skill` prints an agent skill file.
+
+### `claude rc` inside Herdr — why, not just whether
+
+The Remote Control docs state the constraint directly: *"Local process must keep running… To keep a
+session running on a remote machine after you disconnect from SSH, start it inside `tmux` or
+`screen`."* **Herdr fills that slot and is agent-aware while doing it**, which tmux is not. So the
+two compose rather than compete:
+
+- **Herdr** — the multiplexer and keep-alive; cross-platform; every harness.
+- **Remote Control (`claude rc`)** — the phone surface for Claude sessions; already working.
+
+**Caveat for the trial:** the current 3-day-old `claude rc` is *not* inside Herdr. Moving it ends
+that server; `claude remote-control --continue` restores its sessions for about four hours after.
 
 ## Why — the ask (verbatim)
 
