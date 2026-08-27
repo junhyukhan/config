@@ -8,26 +8,10 @@
   "editor.accessibilitySupport": "off",
   "typescript.updateImportsOnFileMove.enabled": "always",
   "terminal.integrated.bellDuration": 1000000000000000000,
-  "boot-java.rewrite.reconcile": true,
-  "boot-java.common.properties-metadata": "",
-  "tabnine.experimentalAutoImports": true,
-  "gitlens.views.branches.branches.layout": "list",
-  "[java]": {
-    "editor.suggest.snippetsPreventQuickSuggestions": false,
-
-    "spotlessGradle.format.enable": true,
-    "editor.codeActionsOnSave": {
-      "source.fixAll.spotlessGradle": "explicit"
-    },
-    "editor.defaultFormatter": "richardwillis.vscode-spotless-gradle"
-  },
   "terminal.integrated.scrollback": 10000,
-  "dotnet.automaticallyCreateSolutionInWorkspace": false,
   "security.workspace.trust.untrustedFiles": "open",
   "workbench.sideBar.location": "right",
   "workbench.editor.focusRecentEditorAfterClose": false,
   "editor.renderWhitespace": "none",
-  "diffEditor.ignoreTrimWhitespace": false,
-  "gitlens.ai.model": "vscode",
-  "gitlens.ai.vscode.model": "copilot:gpt-4o-mini"
+  "diffEditor.ignoreTrimWhitespace": false
 }
