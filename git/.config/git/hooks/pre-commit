@@ -1,0 +1,179 @@
+#!/usr/bin/env python3
+"""pre-commit hook: format staged files, in repos that opted in.
+
+**DRAFT — not wired up.** Nothing runs this until both of these happen:
+
+    stow -R -t "$HOME" git
+    git config --global core.hooksPath "$HOME/.config/git/hooks"
+
+Read the trade-offs at the bottom before doing either.
+
+Why this exists
+---------------
+`format-on-edit.py` (PostToolUse) formats what *Claude* writes, and it closed the
+drift that had put duri-v3's `format:check` red across 60 files. But it is wired on
+`Edit|Write|MultiEdit`, so it never sees:
+
+  * an edit made through **Bash** — `sed -i`, `perl -pi`, a `cat > file` heredoc.
+    Measured 2026-08-10: `duri-v3/src/components/app-header.tsx` was changed in
+    PR #47, three days after that hook landed, and arrived unformatted with its
+    JSX attributes unwrapped — the signature of an in-place stream edit.
+  * an edit made **outside Claude Code entirely** — an editor, another agent, a
+    merge resolution.
+
+A commit is the one chokepoint every edit passes through regardless of who or what
+made it. That is the argument for putting the check here rather than adding more
+tool names to the PostToolUse matcher: the matcher enumerates paths, and the whole
+lesson of the gates in `duri-v3/docs/06` is that an enumerated list is the thing
+that turns out to be incomplete.
+
+Opt-in is by CONFIG, not by binary
+----------------------------------
+Unchanged from `format-on-edit.py`, and **deliberately imported from it rather than
+re-implemented**: a repo is formatted only if it has both the formatter binary and
+that formatter's own config file (`jhkn-dev` ships prettier transitively via Astro
+but chose no prettier config, so it is skipped). That rule is subtle enough to be
+worth exactly one definition — two copies would drift, and the copy that drifted
+would impose a style on a repo that never consented to it.
+
+If `~/.claude/hooks/format-on-edit.py` is not present (claude package not stowed),
+this hook does nothing and allows the commit. It is a convenience, not a gate of
+record — CI is the gate of record.
+
+What it does to your index
+--------------------------
+For each staged file it formats the file and re-stages it, so the commit contains
+the formatted version. **A file that is only partially staged is never touched** —
+if it has both staged and unstaged changes, re-staging it would sweep unstaged work
+into the commit, which is a much worse outcome than a formatting miss. Those files
+are reported and the commit is BLOCKED, so the choice is yours rather than silent.
+
+Bypass with `git commit --no-verify` when you need to.
+"""
+import importlib.util
+import os
+import subprocess
+import sys
+
+TIMEOUT_S = 30
+CLAUDE_HOOK = os.path.expanduser("~/.claude/hooks/format-on-edit.py")
+
+
+def load_shared():
+    """The opt-in rule, imported from its one definition. None if unavailable."""
+    try:
+        spec = importlib.util.spec_from_file_location("format_on_edit", CLAUDE_HOOK)
+        if spec is None or spec.loader is None:
+            return None
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        return mod
+    except Exception:
+        return None
+
+
+def git(*args):
+    return subprocess.run(
+        ["git", *args], capture_output=True, text=True, timeout=TIMEOUT_S, check=False
+    )
+
+
+def staged_files(root):
+    """Staged adds/copies/modifies. Deletions and renames-away are not ours."""
+    out = git("diff", "--cached", "--name-only", "--diff-filter=ACM", "-z")
+    if out.returncode != 0:
+        return []
+    return [os.path.join(root, p) for p in out.stdout.split("\0") if p]
+
+
+def partially_staged(root):
+    """Files with unstaged changes on top of staged ones — do not re-stage these."""
+    out = git("diff", "--name-only", "--diff-filter=ACM", "-z")
+    if out.returncode != 0:
+        return set()
+    return {os.path.join(root, p) for p in out.stdout.split("\0") if p}
+
+
+def main():
+    shared = load_shared()
+    if shared is None:
+        sys.exit(0)  # fail open: no shared opt-in rule, no opinion
+
+    root_proc = git("rev-parse", "--show-toplevel")
+    if root_proc.returncode != 0:
+        sys.exit(0)
+    root = root_proc.stdout.strip()
+
+    files = staged_files(root)
+    if not files:
+        sys.exit(0)
+
+    partial = partially_staged(root)
+    ruff = shared.ruff_cmd(root)
+    prettier = shared.prettier_cmd(root)
+    if not ruff and not prettier:
+        sys.exit(0)  # repo did not opt in
+
+    formatted, skipped = [], []
+    for path in files:
+        if not os.path.isfile(path):
+            continue
+        ext = os.path.splitext(path)[1].lower()
+        if ext in shared.PY_EXTS:
+            argv = [ruff, "format", path] if ruff else None
+        else:
+            argv = (
+                [prettier, "--write", "--ignore-unknown", "--log-level=silent", path]
+                if prettier
+                else None
+            )
+        if not argv:
+            continue
+
+        before = None
+        try:
+            with open(path, "rb") as f:
+                before = f.read()
+            subprocess.run(
+                argv,
+                cwd=root,
+                timeout=TIMEOUT_S,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                check=False,
+            )
+            with open(path, "rb") as f:
+                after = f.read()
+        except Exception:
+            continue  # a formatter failing is never worth blocking a commit
+
+        if before == after:
+            continue
+        if path in partial:
+            # Rewritten on disk, but re-staging would pull in unstaged work.
+            skipped.append(os.path.relpath(path, root))
+            continue
+        if git("add", "--", path).returncode == 0:
+            formatted.append(os.path.relpath(path, root))
+
+    if formatted:
+        print(f"pre-commit: formatted and re-staged {len(formatted)} file(s):")
+        for f in formatted:
+            print(f"  {f}")
+
+    if skipped:
+        print("\npre-commit: BLOCKED — these files are only partially staged:\n")
+        for f in skipped:
+            print(f"  {f}")
+        print(
+            "\nThey have been formatted on disk, but re-staging them would sweep your\n"
+            "unstaged changes into this commit. Stage them yourself (`git add`) and\n"
+            "commit again, or bypass with `git commit --no-verify`.\n"
+        )
+        sys.exit(1)
+
+    sys.exit(0)
+
+
+if __name__ == "__main__":
+    main()
