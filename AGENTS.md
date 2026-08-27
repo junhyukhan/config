@@ -3,7 +3,7 @@ workspace:
   readfirst: docs/README.md
   decisions: docs/decisions/
   backlog: []
-  verify: stow -n -R -t "$HOME" shell nvim ghostty vim && stow -n -R --no-folding -t "$HOME" claude
+  verify: stow -n -R -t "$HOME" shell nvim ghostty vim git tmux && stow -n -R --no-folding -t "$HOME" claude
   autonomy: chore
 ---
 
@@ -46,7 +46,7 @@ dnf repoquery --userinstalled --qf '%{name}' | sort > fedora/packages.txt
 
 ## Architecture
 
-**Symlink-based with GNU Stow**: Each top-level directory (shell, nvim, ghostty, vim, claude, cloudflared) is a stow package. The directory structure inside each package mirrors the path relative to `$HOME`. Running `stow -t ~ <package>` creates symlinks accordingly.
+**Symlink-based with GNU Stow**: Each top-level directory (shell, nvim, ghostty, vim, git, tmux, claude, cloudflared) is a stow package. The directory structure inside each package mirrors the path relative to `$HOME`. Running `stow -t ~ <package>` creates symlinks accordingly.
 
 **Restowing / moving the repo**: Stow creates *relative* symlinks, so moving the repo directory breaks every link. To recover, re-run `./setup.sh` from the new location (it uses `stow -R`, which is idempotent and rebuilds the links).
 
@@ -60,6 +60,25 @@ that Claude Code spawns MCP servers as. Anything an agent-launched process must 
 like `SUPABASE_ACCESS_TOKEN`) belongs in `.zshenv`; everything interactive — prompt, plugins,
 aliases, completions — stays in `.zshrc`. Putting the Supabase PAT in `.zshrc` made the MCP fail
 with `✘ Connection closed` while the credentials were fine (`docs/decisions/supabase-mcp.md`, D4).
+
+**What belongs where — the rule for a reproducible machine.** The repo's job is that a fresh
+machine ends up like this one, so every thing on it falls into exactly one of three buckets:
+
+| Kind | Where it goes | Test |
+|---|---|---|
+| Config **you wrote** | tracked in a stow package | would you be annoyed to rewrite it? |
+| **Tools** | declared in `setup.sh` — the Brewfile if brew carries it, a guarded install block if not (see herdr, powerlevel10k) | does a fresh machine need it present? |
+| Files a **tool generates** | neither — they come back when the tool is installed | does the tool recreate it? |
+
+The third bucket is why `~/.claude/hooks/herdr-agent-state.sh` is *not* tracked even though the
+`hooks/` allowlist would take it: herdr writes it, herdr updates it, and `herdr integration
+uninstall claude` removes it. Tracking it would mean owning a vendor file that gets overwritten.
+`setup.sh` installs herdr and its integration instead, which is what makes the tracked
+`settings.json` reference to that hook valid on a new machine.
+
+**`brew bundle dump` silently drops entries.** It omits `vscode "..."` lines unless the `code` CLI
+is on PATH, and it has dropped them before — verify with a set comparison, not by eyeballing the
+diff, and re-add by hand if needed.
 
 **Package management**:
 - macOS: `mac/Brewfile` with `brew bundle`

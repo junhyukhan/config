@@ -1,38 +1,87 @@
 tap "oven-sh/bun"
+tap "supabase/tap", trusted: { formulae: ["supabase"] }
+# Clone of cat(1) with syntax highlighting and Git integration
 brew "bat"
+# Secure and free password manager for all of your devices
+brew "bitwarden-cli"
+# Cloudflare Tunnel client (formerly Argo Tunnel)
 brew "cloudflared"
+# Modern, maintained replacement for ls
 brew "eza"
+# Simple, fast and user-friendly alternative to find
 brew "fd"
+# Play, record, convert, and stream select audio and video codecs
 brew "ffmpeg"
+# Command-line fuzzy finder written in Go
 brew "fzf"
+# Interact with Google Gemini AI models from the command-line
 brew "gemini-cli"
+# GitHub command-line tool
 brew "gh"
+# Open source programming language to build simple/reliable/efficient software
 brew "go"
+# Kubernetes package manager
 brew "helm"
+# Template-free customization of Kubernetes YAML manifests
 brew "kustomize"
+# Ambitious Vim-fork focused on extensibility and agility
 brew "neovim"
+# 7-Zip (high compression file archiver) implementation
+brew "p7zip"
+# Theme for zsh
 brew "powerlevel10k"
+# Search tool like grep and The Silver Searcher
 brew "ripgrep"
+# Organize software neatly under a single directory tree (e.g. /usr/local)
 brew "stow"
+# User interface to the TELNET protocol
 brew "telnet"
+# Simplified and community-driven man pages
 brew "tldr"
+# Terminal multiplexer
 brew "tmux"
+# Extremely fast Python package installer and resolver, written in Rust
 brew "uv"
+# Feature-rich command-line audio/video downloader
+brew "yt-dlp"
+# Shell extension to navigate your filesystem faster
 brew "zoxide"
+# Fish-like fast/unobtrusive autosuggestions for zsh
 brew "zsh-autosuggestions"
+# Fish shell like syntax highlighting for zsh
 brew "zsh-syntax-highlighting"
+# Enable Windows-like alt-tab
 cask "alt-tab"
+# Tool to flash OS images to SD cards & USB drives
 cask "balenaetcher"
+# Web browser focusing on privacy
 cask "brave-browser"
+# Write, edit, and chat about your code with AI
 cask "cursor"
+# Universal database tool and SQL client
+cask "dbeaver-community"
+# Utilities designed to make common development tasks easier
 cask "devtoys"
 cask "font-fira-mono-nerd-font"
+# Free and open-source media player
 cask "iina"
+# Menu bar manager
 cask "jordanbaird-ice"
+# Blocks all Keyboard and TouchBar input
 cask "keyboardcleantool"
+# Software for Logitech devices
+cask "logi-options+"
+# Replacement for Docker Desktop
 cask "orbstack"
+# Video game digital distribution service
 cask "steam"
+# Open-source code editor
 cask "visual-studio-code"
+go "golang.org/x/tools/gopls"
+npm "pnpm"
+
+# VS Code extensions. `brew bundle dump` only captures these when the `code`
+# CLI is on PATH, so it silently drops them otherwise -- keep them by hand.
 vscode "anthropic.claude-code"
 vscode "astro-build.astro-vscode"
 vscode "github.copilot-chat"
@@ -44,4 +93,3 @@ vscode "ms-python.vscode-pylance"
 vscode "ms-python.vscode-python-envs"
 vscode "ms-vscode-remote.remote-containers"
 vscode "ms-vscode.makefile-tools"
-go "golang.org/x/tools/gopls"
