@@ -84,8 +84,6 @@ npm "pnpm"
 # Bundle has no directive for. Kept deliberately; see AGENTS.md.
 vscode "anthropic.claude-code"
 vscode "astro-build.astro-vscode"
-vscode "github.copilot-chat"
-vscode "gitlab.gitlab-workflow"
 vscode "ms-azuretools.vscode-containers"
 vscode "ms-python.debugpy"
 vscode "ms-python.python"
