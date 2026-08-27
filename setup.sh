@@ -61,6 +61,15 @@ if [[ -f /etc/fedora-release ]]; then
     stow -R -t "$HOME" cloudflared
 fi
 
+# vscode is darwin-only: its config path is macOS-specific
+# (Library/Application Support/Code/User); Fedora uses ~/.config/Code/User.
+# --no-folding for the same reason as claude -- that User/ directory also holds
+# VS Code's own state (globalStorage, History, profiles, workspaceStorage), and
+# folding it would move all of that into this repo.
+if [[ "$OSTYPE" == darwin* ]]; then
+    stow -R --no-folding -t "$HOME" vscode
+fi
+
 # --------------------------------------------------------------------
 # 4. Tools no package manager carries
 # --------------------------------------------------------------------

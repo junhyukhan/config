@@ -46,11 +46,17 @@ dnf repoquery --userinstalled --qf '%{name}' | sort > fedora/packages.txt
 
 ## Architecture
 
-**Symlink-based with GNU Stow**: Each top-level directory (shell, nvim, ghostty, vim, git, tmux, claude, cloudflared) is a stow package. The directory structure inside each package mirrors the path relative to `$HOME`. Running `stow -t ~ <package>` creates symlinks accordingly.
+**Symlink-based with GNU Stow**: Each top-level directory (shell, nvim, ghostty, vim, git, tmux, claude, vscode, cloudflared) is a stow package. The directory structure inside each package mirrors the path relative to `$HOME`. Running `stow -t ~ <package>` creates symlinks accordingly.
 
 **Restowing / moving the repo**: Stow creates *relative* symlinks, so moving the repo directory breaks every link. To recover, re-run `./setup.sh` from the new location (it uses `stow -R`, which is idempotent and rebuilds the links).
 
 **`claude` package uses `--no-folding`**: Claude Code writes runtime state (`sessions/`, `jobs/`, `plugins/`, `history.jsonl`, logs, etc.) into `~/.claude`. If stow folds the whole directory into a single `~/.claude` symlink, all that runtime state lands inside this repo. `--no-folding` keeps `~/.claude` a real directory and symlinks only the tracked files (`settings.json`, `commands/*`). Runtime state is also ignored via `.gitignore` (`claude/.claude/*` with whitelisted configs).
+
+**`vscode` package is darwin-only and also uses `--no-folding`**, for both of the reasons above at
+once. Its path (`Library/Application Support/Code/User`) is macOS-specific — Fedora uses
+`~/.config/Code/User` — so `setup.sh` guards it on `$OSTYPE`. And that `User/` directory holds VS
+Code's own state (`globalStorage`, `History`, `profiles`, `workspaceStorage`), so folding it would
+drag all of that into the repo. Only `settings.json` and `keybindings.json` are tracked.
 
 **Cross-platform zshrc**: OS detection at the top of `.zshrc` sets plugin/theme paths per platform. macOS uses Homebrew paths, Fedora uses `/usr/share/` and `~/powerlevel10k/`.
 
