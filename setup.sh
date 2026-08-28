@@ -56,6 +56,14 @@ stow -R -t "$HOME" shell nvim ghostty vim git tmux
 # repo. See "`claude` package uses --no-folding" in AGENTS.md.
 stow -R --no-folding -t "$HOME" claude
 
+# codex: --no-folding for the same reason as claude (~/.codex holds sessions,
+# SQLite DBs, logs, caches). The package tracks ONE file -- AGENTS.md, itself a
+# symlink to claude/.claude/AGENTS.md -- so Codex loads the same global
+# instructions Claude Code does. Before 2026-08-29 ~/.codex/AGENTS.md was an
+# untracked real file containing a self-referential "@AGENTS.md", so Codex was
+# very likely running with no global instructions at all.
+stow -R --no-folding -t "$HOME" codex
+
 # cloudflared is only used on Fedora
 if [[ -f /etc/fedora-release ]]; then
     stow -R -t "$HOME" cloudflared

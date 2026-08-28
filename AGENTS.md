@@ -3,7 +3,7 @@ workspace:
   readfirst: docs/README.md
   decisions: docs/decisions/
   backlog: []
-  verify: stow -n -R -t "$HOME" shell nvim ghostty vim git tmux && stow -n -R --no-folding -t "$HOME" claude
+  verify: stow -n -R -t "$HOME" shell nvim ghostty vim git tmux && stow -n -R --no-folding -t "$HOME" claude codex
   autonomy: chore
 ---
 
@@ -46,11 +46,21 @@ dnf repoquery --userinstalled --qf '%{name}' | sort > fedora/packages.txt
 
 ## Architecture
 
-**Symlink-based with GNU Stow**: Each top-level directory (shell, nvim, ghostty, vim, git, tmux, claude, vscode, cloudflared) is a stow package. The directory structure inside each package mirrors the path relative to `$HOME`. Running `stow -t ~ <package>` creates symlinks accordingly.
+**Symlink-based with GNU Stow**: Each top-level directory (shell, nvim, ghostty, vim, git, tmux, claude, codex, vscode, cloudflared) is a stow package. The directory structure inside each package mirrors the path relative to `$HOME`. Running `stow -t ~ <package>` creates symlinks accordingly.
+
+**One canonical global instruction file, every harness.** `claude/.claude/AGENTS.md` is the single
+source. `claude/.claude/CLAUDE.md` imports it with `@AGENTS.md`, and `codex/.codex/AGENTS.md` is a
+**symlink** to it — so Claude Code and Codex read the same rules. Do not replace that symlink with a
+copy, and do not add harness-specific rules to it; put those in the harness's own file below the
+import. Record: [`docs/decisions/codex-global-instructions.md`](docs/decisions/codex-global-instructions.md).
 
 **Restowing / moving the repo**: Stow creates *relative* symlinks, so moving the repo directory breaks every link. To recover, re-run `./setup.sh` from the new location (it uses `stow -R`, which is idempotent and rebuilds the links).
 
 **`claude` package uses `--no-folding`**: Claude Code writes runtime state (`sessions/`, `jobs/`, `plugins/`, `history.jsonl`, logs, etc.) into `~/.claude`. If stow folds the whole directory into a single `~/.claude` symlink, all that runtime state lands inside this repo. `--no-folding` keeps `~/.claude` a real directory and symlinks only the tracked files (`settings.json`, `commands/*`). Runtime state is also ignored via `.gitignore` (`claude/.claude/*` with whitelisted configs).
+
+**`codex` package uses `--no-folding`** for the same reason as `claude`, more so: `~/.codex` holds
+`sessions/`, three SQLite databases with WAL sidecars, logs, caches, and plugins. The package tracks
+exactly one file, `AGENTS.md` (the symlink above); everything else under it is gitignored.
 
 **`vscode` package is darwin-only and also uses `--no-folding`**, for both of the reasons above at
 once. Its path (`Library/Application Support/Code/User`) is macOS-specific — Fedora uses

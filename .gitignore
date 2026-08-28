@@ -16,3 +16,11 @@ claude/.claude/*
 !claude/.claude/skills/
 !claude/.claude/AGENTS.md
 !claude/.claude/CLAUDE.md
+
+# Codex writes far more runtime state into ~/.codex than Claude does into
+# ~/.claude (sessions/, three SQLite DBs + WAL sidecars, logs, caches, plugins).
+# Same treatment: ignore the package, whitelist only what's tracked.
+# AGENTS.md here is a symlink to claude/.claude/AGENTS.md -- ONE canonical global
+# instruction file, two harnesses. Don't replace it with a copy.
+codex/.codex/*
+!codex/.codex/AGENTS.md
