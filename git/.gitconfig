@@ -2,7 +2,7 @@
 [user]
 # Please adapt and uncomment the following lines:
 	name = Jun Hyuk Han
-	email = jhkn.dev@icloud.com
+	email = jhkn.dev@gmail.com
 [credential "https://github.com"]
 	helper = 
 	helper = !gh auth git-credential
