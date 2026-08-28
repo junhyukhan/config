@@ -39,7 +39,50 @@ GitHub — the reasoning for why it is the way it is should be inside.
 ## 2. Write it
 
 One file per **topic**, appended to as the topic evolves — not one file per session. If a record for
-this topic exists, add to it; the newest decision goes first.
+this topic exists, add to it; **the newest decision goes first.**
+
+**Newest-first is not decoration — it is what keeps a growing record cheap to read.** A new amendment
+goes directly under `## Discussion`, above the older ones. Never append to the bottom. This rule has
+existed since the skill was written and was not followed once: `cross-repo-retrieval.md` grew to 877
+lines with its newest entry — a deferral that *re-opened a decision closed two days earlier* — at
+roughly line 870. A reader must reach the current state without reading the history.
+
+Measured 2026-08-29 before keeping the one-file-per-topic rule: of 28 records, 16 are under 150 lines
+and 25 are under 400. Files are not growing without bound; three long-running topics are large. So
+the rule stands, and the fix for read cost is ordering plus `description`, not fragmenting the
+argument. When a topic genuinely **forks**, give the fork its own file (as `source-of-truth.md` was
+split out of `cross-repo-retrieval.md`) — split on evidence, not on a size rule.
+
+### Frontmatter — OKF v0.2, used as-is
+
+Every record carries YAML frontmatter in [OKF
+v0.2](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md) form. **No
+local extensions** — the spec is used unmodified. Decision: `repos/docs/decisions/cross-repo-retrieval.md`.
+
+```yaml
+---
+type: Decision
+title: <Topic>
+description: <one sentence — see below>
+status: draft | stable | deprecated
+tags: [...]
+generated: { by: human:junhyukhan, at: <ISO 8601> }
+---
+```
+
+- **`description` is the record's machine API.** The generated decisions index shows this line and
+  nothing else, so it must be enough for an agent to recognise the record *applies*. A title cannot
+  do that: `"Agent ops"` would not have stopped an agent re-proposing `ops/state.db` 23 days after
+  it was retired, but *"SQLite persistence retired 2026-07-30; `seen.json` replaced it"* would have,
+  instantly.
+- **`status`** is OKF's three-value enum (§5.4), not a four-value one. **Superseded is written as
+  `deprecated` plus a sentence naming the successor**, because OKF links are untyped by deliberate
+  design (§6.1: *"the specific kind is conveyed by the surrounding prose, not by the link itself"*).
+  Do not invent a `superseded_by` key.
+- **`generated.by`** uses the actor convention (§7): `human:<id>` for hand-authored, `<producer>/<version>`
+  for an agent. The `human:` prefix is what marks content as human-authored, so use it accurately —
+  do not mark an agent-drafted record as `human:`.
+- Keep the prose `**Status:**` line too; it carries detail the enum cannot.
 
 Copy the shape from that repo's `docs/decisions/TEMPLATE.md`:
 
