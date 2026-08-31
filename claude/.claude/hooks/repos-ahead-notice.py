@@ -63,13 +63,27 @@ def ahead_count(root):
 
 
 def checker_age_days():
-    """Whole days since `ops/index.py` last completed a written run, or None."""
+    """Whole days since `ops/index.py` last completed a written run, or None.
+
+    Catches broadly and on purpose. The subtraction used to sit OUTSIDE the try, and
+    the tuple was written by guessing at failure modes rather than tracing them, so a
+    naive `updated` — or an int, a null, or a top-level list — raised TypeError past
+    the handler. This function is called before the repo scan, so that did not
+    degrade to "no age": it aborted main(), and the blanket handler at the bottom
+    swallowed it. One missing `+00:00` and the unpushed-repos notice, which is the
+    hook's original job, went silent forever.
+
+    seen.json is gitignored, per-machine, deliberately human-readable, and documented
+    as safe to delete by hand — so assume it will be hand-edited into odd shapes.
+    """
     try:
         raw = json.loads(SEEN_PATH.read_text())
         when = datetime.fromisoformat(raw["updated"])
-    except (OSError, ValueError, KeyError, json.JSONDecodeError):
+        if when.tzinfo is None:
+            when = when.replace(tzinfo=timezone.utc)
+        return (datetime.now(timezone.utc) - when).days
+    except Exception:
         return None
-    return (datetime.now(timezone.utc) - when).days
 
 
 def main():
