@@ -63,10 +63,12 @@ local extensions** — the spec is used unmodified. Decision: `repos/docs/decisi
 ---
 type: Decision
 title: <Topic>
-description: <one sentence — see below>
+description: >-
+  <one sentence — see below. Always use the `>-` folded form: a plain scalar breaks
+  YAML the moment the sentence contains a bare `: ` or opens with a backtick.>
 status: draft | stable | deprecated
 tags: [...]
-generated: { by: human:junhyukhan, at: <ISO 8601> }
+generated: { by: claude/opus-5, at: <ISO 8601> }   # `human:<id>` ONLY if Han hand-wrote it
 ---
 ```
 

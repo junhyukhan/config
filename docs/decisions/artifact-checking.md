@@ -1,3 +1,14 @@
+---
+type: Decision
+title: Artifact-checking — a disposition in AGENTS.md, with checks at the point of use
+description: >-
+  "Verify against the artifact, not a summary of it" stays a short rule in AGENTS.md, while the
+  concrete hazards live at their point of use inside the `grill` and `decide` skills.
+status: stable
+tags: [config, agents-md, skills, verification, artifact-checking, grill, decide]
+generated: { by: claude/opus-5, at: 2026-07-30T00:00:00Z }
+---
+
 # Artifact-checking — a disposition in `AGENTS.md`, with checks at the point of use
 
 **Status:** DECIDED (2026-07-30) · provisional by agreement

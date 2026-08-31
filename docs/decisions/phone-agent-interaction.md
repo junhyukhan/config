@@ -1,3 +1,14 @@
+---
+type: Decision
+title: Phone → agent interaction (iPhone as a first-class control surface)
+description: >-
+  The phone goal was already met by `claude rc` and this record did not know it; what remains is
+  the multi-harness gap. Herdr installed 2026-08-27, trial NOT run.
+status: draft
+tags: [config, phone, remote-control, herdr, tmux, multi-harness]
+generated: { by: claude/opus-5, at: 2026-08-28T00:00:00Z }
+---
+
 # Phone → agent interaction (iPhone as a first-class control surface)
 
 **Status:** in progress — **Herdr installed 2026-08-27**, trial not yet run

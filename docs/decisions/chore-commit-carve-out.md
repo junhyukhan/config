@@ -1,3 +1,14 @@
+---
+type: Decision
+title: The `chore` carve-out to the no-commit rule
+description: >-
+  The one exception letting an agent commit to main unasked; all four conditions must hold —
+  docs-only, verifier green, working tree otherwise clean, and obviously a chore.
+status: stable
+tags: [config, agents-md, git, autonomy, chore, commits]
+generated: { by: claude/opus-5, at: 2026-07-29T00:00:00Z }
+---
+
 # The `chore` carve-out to the no-commit rule
 
 **Status:** DECIDED (2026-07-29) · record relocated here 2026-07-30

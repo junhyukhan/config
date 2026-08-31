@@ -1,3 +1,14 @@
+---
+type: Decision
+title: Supabase MCP server
+description: >-
+  The Supabase MCP runs `--read-only` with a pinned `--project-ref` — removed 2026-08-05,
+  restored 2026-08-06 with the CLI as the write path; all three settings sit in GUARDED_CONFIG.
+status: stable
+tags: [config, mcp, supabase, duri-v3, secrets, guarded-config]
+generated: { by: claude/opus-5, at: 2026-08-06T00:00:00Z }
+---
+
 # Supabase MCP server
 
 **Status:** done (2026-08-04)

@@ -1,3 +1,15 @@
+---
+type: Decision
+title: "`grill` and `decide` — two skills absorbed from mattpocock/skills"
+description: >-
+  Three ideas were absorbed from mattpocock/skills and rewritten as the local `grill` and
+  `decide`; the library was deliberately NOT cloned into the workspace and NOT installed as a
+  plugin.
+status: stable
+tags: [config, skills, grill, decide, claude-code, external]
+generated: { by: claude/opus-5, at: 2026-07-30T00:00:00Z }
+---
+
 # `grill` and `decide` — two skills absorbed from `mattpocock/skills`
 
 **Status:** DECIDED (2026-07-30)
