@@ -45,6 +45,11 @@ Codex once.** Skills remain Claude-only.
   - [`decisions/codex-global-instructions.md`](decisions/codex-global-instructions.md) — Codex was
     reading a self-referential `@AGENTS.md` and loading no global rules across 41 sessions; the
     `codex` stow package symlinks it to the one canonical file. **Unverified until Codex is run.**
+  - [`decisions/caveman-assessment.md`](decisions/caveman-assessment.md) — what was taken from
+    `juliusbrussee/caveman` (its compression rules and, above all, the pattern of gating a prose
+    rewrite with a deterministic validator) and what was left (the response-style skill: ~1–1.5k
+    input tokens per turn, net-negative on terse coding Q&A). Its headline **"65% (measured)" is
+    unsupported** — `benchmarks/results/` is empty and the repo's own `HONEST-NUMBERS.md` says so.
 
 <!-- Add state singletons here as the repo grows — one file each, rewritten in place:
 - **`roadmap.md`** — phases / what's planned

@@ -1,10 +1,9 @@
 ---
 type: Decision
 title: Codex was running with no global instructions — one canonical AGENTS.md, symlinked
-description: ~/.codex/AGENTS.md was an untracked real file containing a self-referential "@AGENTS.md",
-  so 41 Codex sessions very likely loaded none of the global rules; fixed 2026-08-29 with a `codex`
-  stow package whose AGENTS.md is a symlink to claude/.claude/AGENTS.md. Verified resolving, NOT yet
-  verified by an actual Codex run.
+description: >-
+  `~/.codex/AGENTS.md` was an untracked self-referential stub, so 41 Codex sessions likely loaded
+  no global rules; fixed 2026-08-29 by a stow symlink, not yet verified by a real Codex run.
 status: stable
 tags: [config, stow, codex, claude-code, agent-ops, cross-harness]
 generated: { by: claude/opus-5, at: 2026-08-29T04:24:00Z }

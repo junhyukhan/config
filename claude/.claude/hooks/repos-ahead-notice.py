@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""SessionStart hook (read-only): surface workspace repos with unpushed commits so
-the agent can offer to sync them.
+"""SessionStart hook (read-only): surface workspace repos with unpushed commits, and
+say how long it has been since the workspace checker last ran.
 
 This is the "trigger" half of the on-demand sync design: detection is automatic and
 safe here (no network, no writes — it only compares each repo's HEAD to its
@@ -8,14 +8,27 @@ already-known upstream tracking ref), so it cannot hang or be killed the way the
 SessionEnd push hook could. The actual push is done explicitly by the /sync-repos
 skill when the user agrees. Stdout is injected into the session context.
 
-Fail-silent, fast. Prints nothing when everything is already pushed.
+The liveness half is Step 2 of `repos/docs/decisions/cross-repo-retrieval.md`. A
+checker nobody runs is worse than no checker: every "no findings" it printed weeks ago
+still reads as reassurance. `ops/index.py` now reports its own last-run age at the top
+of its output, but that only helps someone already running it — so the age is surfaced
+here too, where a session sees it without asking.
+
+Fail-silent, fast. Prints nothing when everything is pushed and the checker is fresh.
 """
+import json
 import os
 import subprocess
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 REPOS_ROOT = Path.home() / "workdir" / "repos"
+
+# Read straight from the checker's own state file rather than a second timestamp of
+# our own: one source, and it cannot disagree with what `ops/index.py` prints.
+SEEN_PATH = REPOS_ROOT / "ops" / "seen.json"
+STALE_DAYS = 7
 PRUNE = {"node_modules", ".git", "archive", "dist", ".next", ".astro", "build", ".venv"}
 MAX_DEPTH = 3
 
@@ -49,9 +62,29 @@ def ahead_count(root):
         return 0
 
 
+def checker_age_days():
+    """Whole days since `ops/index.py` last completed a written run, or None."""
+    try:
+        raw = json.loads(SEEN_PATH.read_text())
+        when = datetime.fromisoformat(raw["updated"])
+    except (OSError, ValueError, KeyError, json.JSONDecodeError):
+        return None
+    return (datetime.now(timezone.utc) - when).days
+
+
 def main():
     if not REPOS_ROOT.is_dir():
         return
+
+    age = checker_age_days()
+    if age is None:
+        print("[repos-ops] Workspace checker has no recorded run. "
+              "`python3 ops/index.py` reports drift, dead links, stale content and "
+              "records owed.")
+    elif age >= STALE_DAYS:
+        print(f"[repos-ops] Workspace checker last ran {age} days ago — its last "
+              f"clean bill of health is that old. Offer to run `python3 ops/index.py`.")
+
     ahead = []
     for repo in find_repos(REPOS_ROOT):
         try:
