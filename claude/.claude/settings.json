@@ -63,6 +63,18 @@
   "switchModelsOnFlag": true,
   "agentPushNotifEnabled": true,
   "autoMode": {
+    "allow": [
+      "$defaults",
+      "Bash(tailscale status:*)",
+      "Bash(tailscale ip:*)",
+      "Bash(uv run:*)",
+      "Bash(stow:*)"
+    ],
+    "soft_deny": [
+      "$defaults",
+      "Bash(tailscale up:*)",
+      "Bash(tailscale logout:*)"
+    ],
     "environment": [
       "### Org-wide",
       "**Organization**: None configured (personal GitHub account `junhyukhan`)",
@@ -87,18 +99,11 @@
       "**Primary use of Claude Code**: software development (personal projects: dotfiles/workspace tooling, homelab, side apps)",
       "**Trusted repo**: /Users/junhyukhan/workdir/repos with remote https://github.com/junhyukhan/workspace.git (private) — confidential material is fine there; content ported, repointed, or first read from outside this session's repo is not its own work. Visibility scopes confidential material only: secrets and sensitive data are never cleared into any repo by its visibility.",
       "**Org-specific CLIs**: uv, npx, tailscale, herdr, stow, psql (personal toolchain observed in this project)"
-    ],
-    "allow": [
-      "$defaults",
-      "Bash(tailscale status:*)",
-      "Bash(tailscale ip:*)",
-      "Bash(uv run:*)",
-      "Bash(stow:*)"
-    ],
-    "soft_deny": [
-      "$defaults",
-      "Bash(tailscale up:*)",
-      "Bash(tailscale logout:*)"
     ]
+  },
+  "voiceEnabled": true,
+  "voice": {
+    "enabled": true,
+    "mode": "hold"
   }
 }
