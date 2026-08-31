@@ -68,7 +68,7 @@ description: >-
   YAML the moment the sentence contains a bare `: ` or opens with a backtick.>
 status: draft | stable | deprecated
 tags: [...]
-generated: { by: human:junhyukhan, at: <ISO 8601> }
+generated: { by: claude/opus-5, at: <ISO 8601> }   # `human:<id>` ONLY if Han hand-wrote it
 ---
 ```
 

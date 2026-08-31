@@ -7,7 +7,7 @@ description: >-
   compresses only prose.
 status: stable
 tags: [config, skills, caveman, compression, tokens, external, measurement]
-generated: { by: human:junhyukhan, at: 2026-08-29T00:00:00Z }
+generated: { by: claude/opus-5, at: 2026-08-29T00:00:00Z }
 ---
 
 # caveman — what was taken, and the claim that does not hold up

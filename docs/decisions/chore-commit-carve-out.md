@@ -6,7 +6,7 @@ description: >-
   docs-only, verifier green, working tree otherwise clean, and obviously a chore.
 status: stable
 tags: [config, agents-md, git, autonomy, chore, commits]
-generated: { by: human:junhyukhan, at: 2026-07-29T00:00:00Z }
+generated: { by: claude/opus-5, at: 2026-07-29T00:00:00Z }
 ---
 
 # The `chore` carve-out to the no-commit rule

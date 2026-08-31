@@ -6,7 +6,7 @@ description: >-
   concrete hazards live at their point of use inside the `grill` and `decide` skills.
 status: stable
 tags: [config, agents-md, skills, verification, artifact-checking, grill, decide]
-generated: { by: human:junhyukhan, at: 2026-07-30T00:00:00Z }
+generated: { by: claude/opus-5, at: 2026-07-30T00:00:00Z }
 ---
 
 # Artifact-checking — a disposition in `AGENTS.md`, with checks at the point of use

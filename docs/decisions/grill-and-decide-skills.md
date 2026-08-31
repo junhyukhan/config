@@ -7,7 +7,7 @@ description: >-
   plugin.
 status: stable
 tags: [config, skills, grill, decide, claude-code, external]
-generated: { by: human:junhyukhan, at: 2026-07-30T00:00:00Z }
+generated: { by: claude/opus-5, at: 2026-07-30T00:00:00Z }
 ---
 
 # `grill` and `decide` — two skills absorbed from `mattpocock/skills`

@@ -6,7 +6,7 @@ description: >-
   the multi-harness gap. Herdr installed 2026-08-27, trial NOT run.
 status: draft
 tags: [config, phone, remote-control, herdr, tmux, multi-harness]
-generated: { by: human:junhyukhan, at: 2026-08-13T00:00:00Z }
+generated: { by: claude/opus-5, at: 2026-08-28T00:00:00Z }
 ---
 
 # Phone → agent interaction (iPhone as a first-class control surface)
