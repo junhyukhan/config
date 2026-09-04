@@ -2,8 +2,8 @@
 type: Decision
 title: Phone → agent interaction (iPhone as a first-class control surface)
 description: >-
-  The phone goal was already met by `claude rc` and this record did not know it; what remains is
-  the multi-harness gap. Herdr installed 2026-08-27, trial NOT run.
+  Herdr v0.8.2 is in production use since 2026-08-30 — phone sessions run inside it, and its CLI
+  drives agents, worktrees and notifications. The `claude rc` phone goal was already met.
 status: draft
 tags: [config, phone, remote-control, herdr, tmux, multi-harness]
 generated: { by: claude/opus-5, at: 2026-08-28T00:00:00Z }
@@ -11,9 +11,44 @@ generated: { by: claude/opus-5, at: 2026-08-28T00:00:00Z }
 
 # Phone → agent interaction (iPhone as a first-class control surface)
 
-**Status:** in progress — **Herdr installed 2026-08-27**, trial not yet run
+**Status:** in use (2026-09-02) — the trial is over; Herdr is the live phone→agent surface
 
 ## Resume here
+
+**The trial happened, it passed, and Herdr is adopted.**
+
+> **Verbatim (Han, 2026-09-02):** "Btw this mobile claude code session is being run inside a herdr
+> session on my laptop, locally. So the herdr mcp/cli/etc can in fact be used."
+
+> **Verbatim (Han, 2026-09-02 — the commitment):** "yes herdr is here to stay."
+
+Everything below the next heading is the 2026-08-27 planning state, kept as history — do not act on
+its "next step".
+
+Verified 2026-09-02: `herdr 0.8.2`, server up since **2026-08-30 16:26**, `~/.local/bin/herdr` on
+PATH. The CLI surface that matters to agents:
+
+| Command | What it gives |
+|---|---|
+| `herdr agent start\|prompt\|read\|wait\|list` | drive **separate Claude Code sessions** in panes — own context, not in-process subagents |
+| `herdr worktree create\|open\|remove` | git-worktree-backed workspaces, one checkout per session |
+| `herdr notification show` | a notification channel that reaches the phone |
+| `herdr --skill` | loads Herdr's own control-surface skill; use it before driving panes |
+
+**Why this matters beyond the phone goal.** `herdr agent` sessions read `AGENTS.md` themselves and
+build their own model of the code, so a reviewing agent cannot inherit the requesting agent's
+hypothesis space the way an in-process subagent does. Demonstrated 2026-09-02: four in-process
+subagents reviewed `repos` PR #2 and found 24 real defects, but the sharpest one was **vector 1 on
+the prompt's own list** — the review confirmed a hunch rather than finding it independently. Han's
+correction, verbatim: *"the review should not have inherited the bias - it is an adversarial
+review."* `herdr worktree` also gives each reviewer its own checkout, which the four subagents did
+not have; they shared one working tree and had to be told to restore state after breaking things.
+
+Related, and cheaper than what it replaces: `herdr notification show` supersedes the
+"inject a banner into the served page" idea logged in `repos/docs/backlog.md` for the workspace
+console's silent rebuild failures.
+
+## The 2026-08-27 planning state (history)
 
 **Herdr v0.8.2 is installed** at `~/.local/bin/herdr` (on PATH). The binary was downloaded from the
 pinned GitHub release rather than by piping `install.sh`, and its SHA-256 was verified against
@@ -23,11 +58,11 @@ consistent: its `0.8.0` entry still reads `d53a9f93…c658178`, matching what th
 
 `~/.tmux.conf` and `shell/.zshrc` are **still untouched**, and no launcher was written.
 
-**A `herdr server` is running** (started incidentally by a `herdr status` call, not deliberately).
-`herdr server stop` ends it.
+**A `herdr server` is running** — as of 2026-08-27 this was incidental, started by a `herdr status`
+call. It is now deliberate and long-lived (up since 2026-08-30). `herdr server stop` ends it.
 
-**Next step: run the trial.** Start `herdr`, run `claude rc` in a pane, and answer the open questions
-at the bottom — that is also when the tmux prefix question either revives or dies for good.
+~~**Next step: run the trial.**~~ **Done 2026-08-30** — see *Resume here* above. The tmux prefix
+question is still open; nothing has been written to `~/.tmux.conf`.
 
 ## What the 2026-08-27 session established
 
