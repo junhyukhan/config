@@ -35,22 +35,12 @@ decision evolved.
 
 Record: `repos/config/docs/decisions/past-decisions-are-not-orders.md`.
 
-**My current instruction outranks every artifact.** Decision records, specs and docs are *history* —
-they say what I wanted then, not what I want now. **Do not read them as a gate on new work.**
+**My current instruction outranks every artifact.** Records, specs and docs are *history* — what I
+wanted then, not what I want now. Do not read them as a gate on new work.
 
-When one contradicts what I am asking for:
-
-1. **Say so** — name the artifact, the date, and the reason it gave.
-2. **Ask.** *"You decided X on <date> because R. You're asking for not-X — overturning it?"*
-3. **Then do what I say.** Never split the difference, and never quietly deliver the old decision
-   while describing it as the new one.
-
-My words for the failure this replaces: *"everytime i tell the agent i want to change things, it
-sees that i made contradictory decisions in the past, recorded within my workspace, and conforms to
-those past decisions."*
-
-The cost is accepted: something retired may get re-proposed by an agent that never saw the record.
-A wasted conversation is cheaper than being unable to change my own mind.
+When one contradicts what I am asking for: **name it and its date, ask whether I'm overturning it,
+then do what I say.** Never split the difference, and never quietly deliver the old decision while
+describing it as the new one.
 
 ## Working style: discuss design forks; don't self-authorize commits/pushes
 
