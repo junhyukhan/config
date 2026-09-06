@@ -1,1 +1,12 @@
+# Ghostty configuration.
+#
+# Stowed: config/ghostty/.config/ghostty/config -> ~/.config/ghostty/config
+# Restore with `stow -R -t ~ ghostty` from the config repo; never hand-create
+# the symlink (AGENTS.md).
+#
+# Ghostty loads the FIRST config it finds, not a merge. This XDG path wins over
+# ~/Library/Application Support/com.mitchellh.ghostty/config — that file is
+# Ghostty's auto-generated template from before this package existed, and is
+# silently ignored while this one exists. Verified 2026-09-05.
 
+theme = Rose Pine Dawn
