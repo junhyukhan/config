@@ -24,13 +24,25 @@ sessions very likely ran with **no global instructions at all**. It is now a sym
 `claude/.claude/AGENTS.md` — one canonical file, both harnesses. **Outstanding: confirm by launching
 Codex once.** Skills remain Claude-only.
 
+**New 2026-09-06 — the publishing rules are in `claude/.claude/AGENTS.md`.** The confirmation gate
+([`decisions/chore-commit-carve-out.md`](decisions/chore-commit-carve-out.md)) now names merge, PR
+create/delete, commit, push and comment, and binds any agent; identity, attribution and writing style
+([`decisions/agent-authored-output.md`](decisions/agent-authored-output.md)) are a new `## What you
+publish` section. **Outstanding:** the edit is uncommitted and pending Han's review, what a comment's
+attribution should say is still undecided, and `repos/ops/orchestrator.py`'s dispatch brief still
+carries the old "never commit or push" wording.
+
 ## Index
 
 - **`decisions/`** — design decisions & specs, one file per topic, each a **verbatim ask +
   Discussion** (copy `decisions/TEMPLATE.md` to start one). The append-only record of *why*
   things are the way they are.
   - [`decisions/chore-commit-carve-out.md`](decisions/chore-commit-carve-out.md) — the narrow
-    exception letting an agent commit and push without asking.
+    exception letting an agent commit and push without asking; amended 2026-09-05 so the rule
+    covers merge, PR create/delete and comments, and binds every agent rather than one session.
+  - [`decisions/agent-authored-output.md`](decisions/agent-authored-output.md) — agents publish
+    under Han's own GitHub identity, must attribute what he did not write, and write by linking
+    rather than restating.
   - [`decisions/artifact-checking.md`](decisions/artifact-checking.md) — why "verify against the
     artifact" stays a disposition in `AGENTS.md`, with concrete checks at their points of use.
   - [`decisions/grill-and-decide-skills.md`](decisions/grill-and-decide-skills.md) — what was

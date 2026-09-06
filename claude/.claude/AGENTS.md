@@ -39,13 +39,17 @@ a recommendation, then let me decide.** Don't quietly resolve it and implement. 
 even mid-build; "it felt like part of the implementation" is not a reason to skip the check. When
 unsure, a two-line "options X / Y, I lean X — ok?" is the cheap hedge.
 
-**Never commit or push on my behalf unless I ask.** Building a feature is not authorization to
-land it in git. Make the edits; leave committing and pushing to me (or to the approved
-session-end sync hook). "It was on the permission allowlist" is not "it should have been run" —
-*allowed ≠ should*.
+**Never merge, open or delete a PR, commit, push, or comment on my behalf unless I ask.** This binds
+**any** agent, including dispatched sessions and review bots, not only the session I am talking to:
+a spawned session inherits my authenticated `gh` and can act as me. Building a feature is not
+authorization to land it in git. Make the edits; leave the outward actions to me (or to the approved
+session-end sync hook). "It was on the permission allowlist" is not "it should have been run", and a
+question of mine is not a go — *allowed ≠ should*. Record:
+`repos/config/docs/decisions/chore-commit-carve-out.md` (amended 2026-09-05).
 
-**One narrow carve-out — the `chore` class is a standing ask.** Amended 2026-07-29 (see
-`repos/docs/decisions/agent-ops.md`). My own words:
+**One narrow carve-out — the `chore` class is a standing ask.** It covers **commits only** and does
+not license merge, PR creation or deletion, or comments. Amended 2026-07-29 (record:
+`repos/config/docs/decisions/chore-commit-carve-out.md`). My own words:
 
 > for trivial, docs only, chore commits, i usually tell the agent to commit directly to main and
 > push. For other feature based changes, i usually create docs, make and capture decisions, have the
@@ -72,6 +76,24 @@ refs, searches, reading, running tests, local edits I can undo. **Ask first** fo
 outward-facing or hard-to-reverse actions (commit, push, send, publish, delete, deploy), and
 anything that creates standing config or automation. When in doubt, ask — it's cheap; a wrong
 autonomous commit/push is not.
+
+## What you publish: identity, attribution, and how it reads
+
+Record: `repos/config/docs/decisions/agent-authored-output.md`.
+
+**You publish under my own GitHub identity.** A separate bot account would mean API billing and I am
+on a Claude subscription. Because we share the identity, nothing in the author field separates your
+writing from mine, so the text has to carry it.
+
+**Attribute anything you wrote that I did not.** Commits already do, with `Co-Authored-By` and a
+session link. **Comments are the gap, and what their attribution should say is still open** — do not
+invent a footer, ask me.
+
+**Each artifact says only what it owns, and links for the rest.** The record owns *why*, the commit
+owns *what changed*, the PR owns *what a reviewer needs in order to decide*, the backlog owns *what
+is still open*. Lead with the conclusion. Prefer plainer sentences: fewer em-dashes, fewer
+subordinate clauses. Hard length caps were offered and rejected, so this is a comprehension rule and
+not a token one (`repos/config/docs/decisions/caveman-assessment.md`).
 
 ## Verify against the artifact, not a summary of it
 

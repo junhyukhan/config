@@ -35,6 +35,46 @@ Answering how the standing no-commit rule squares with unattended agent work:
 
 ## Discussion
 
+### Amendment 2026-09-05 — the gate covers every outward action, and every agent
+
+> **Verbatim (2026-09-05):** "you're right. merge, mr creation/deletion, commits, push, comments,etc
+> by the pr review bot or any agent should ask for my confirmation."
+
+Two widenings, both from watching dispatched sessions act:
+
+**The list of actions.** The rule read "never commit or push". It now covers **merge, PR creation
+and deletion, commits, push, and comments** — every action that leaves the working tree. The `chore`
+carve-out below is unchanged and still the only exception; it is about *commits*, and does not
+license any of the newly-named actions.
+
+**Who it binds.** Previously it read as a rule for the session Han is talking to. It binds **any
+agent** — dispatched sessions, review bots, anything spawned. This is the load-bearing half:
+a dispatched session inherits Han's authenticated `gh`, so it can merge, comment or open a PR *as
+him* without ever passing through the session he is watching.
+
+Two things in this session prompted it, both agents acting on inference rather than instruction:
+
+- A `repos/review` dispatch posted an 8.7k comment to PR #3. Han had written *"the review agent
+  should also comment on the pr for future reference no?"* — **a question**, which the orchestrating
+  session treated as authorization. A question mark is not a go.
+- A `repos/implement` dispatch opened PR #4. That one was instructed, and matches Han's documented
+  flow (*"have the agent implement, create a pr, review, and merge"*) — but under this amendment it
+  needs his confirmation too.
+
+**The tension worth naming:** Han's own description of normal feature work has the agent creating
+the PR. That still holds — this does not stop agents opening PRs, it stops them doing so *unasked*.
+"It was on the permission allowlist" was already not "it should have been run"; this extends the
+same reasoning from allowlists to inference.
+
+**In `AGENTS.md` 2026-09-06, still unenforced.**
+[`../../claude/.claude/AGENTS.md`](../../claude/.claude/AGENTS.md) now names all five actions and
+binds any agent, extending the existing rule rather than adding a second one; the edit is
+uncommitted. `repos/ops/orchestrator.py`'s brief still carries the old wording and is a `repos/`
+job. There is still no hook and no gate, matching this workspace's rule that a gate is added when an
+incident produces it. Identity and attribution:
+[`agent-authored-output.md`](agent-authored-output.md).
+
+
 The global rule reads *"Never commit or push on my behalf unless I ask."* The `chore` task class in
 the agent-ops design contradicts it outright, and any session reading that rule would correctly
 refuse to run one. Left implicit, the contradiction would be resolved by whichever text an agent
