@@ -10,7 +10,7 @@ skill when the user agrees. Stdout is injected into the session context.
 
 The liveness half is Step 2 of `repos/docs/decisions/cross-repo-retrieval.md`. A
 checker nobody runs is worse than no checker: every "no findings" it printed weeks ago
-still reads as reassurance. `ops/index.py` now reports its own last-run age at the top
+still reads as reassurance. `agentlab/ops/index.py` now reports its own last-run age at the top
 of its output, but that only helps someone already running it — so the age is surfaced
 here too, where a session sees it without asking.
 
@@ -26,8 +26,9 @@ from pathlib import Path
 REPOS_ROOT = Path.home() / "workdir" / "repos"
 
 # Read straight from the checker's own state file rather than a second timestamp of
-# our own: one source, and it cannot disagree with what `ops/index.py` prints.
-SEEN_PATH = REPOS_ROOT / "ops" / "seen.json"
+# our own: one source, and it cannot disagree with what `agentlab/ops/index.py` prints.
+# The checker moved to repos/agentlab/ops/ on 2026-09-06 when the lab split out.
+SEEN_PATH = REPOS_ROOT / "agentlab" / "ops" / "seen.json"
 STALE_DAYS = 7
 PRUNE = {"node_modules", ".git", "archive", "dist", ".next", ".astro", "build", ".venv"}
 MAX_DEPTH = 3
@@ -63,7 +64,7 @@ def ahead_count(root):
 
 
 def checker_age_days():
-    """Whole days since `ops/index.py` last completed a written run, or None.
+    """Whole days since `agentlab/ops/index.py` last completed a written run, or None.
 
     Catches broadly and on purpose. The subtraction used to sit OUTSIDE the try, and
     the tuple was written by guessing at failure modes rather than tracing them, so a
@@ -93,11 +94,11 @@ def main():
     age = checker_age_days()
     if age is None:
         print("[repos-ops] Workspace checker has no recorded run. "
-              "`python3 ops/index.py` reports drift, dead links, stale content and "
+              "`python3 agentlab/ops/index.py` reports deploy drift, branch state and "
               "records owed.")
     elif age >= STALE_DAYS:
         print(f"[repos-ops] Workspace checker last ran {age} days ago — its last "
-              f"clean bill of health is that old. Offer to run `python3 ops/index.py`.")
+              f"clean bill of health is that old. Offer to run `python3 agentlab/ops/index.py`.")
 
     ahead = []
     for repo in find_repos(REPOS_ROOT):

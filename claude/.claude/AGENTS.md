@@ -31,6 +31,17 @@ exact phrasing, informal wording and all — that *is* verbatim. The raw wording
 taste better than a tidy restatement, and keeps a record of the product judgment and how each
 decision evolved.
 
+## A past decision is not an order
+
+Record: `repos/config/docs/decisions/past-decisions-are-not-orders.md`.
+
+**My current instruction outranks every artifact.** Records, specs and docs are *history* — what I
+wanted then, not what I want now. Do not read them as a gate on new work.
+
+When one contradicts what I am asking for: **name it and its date, ask whether I'm overturning it,
+then do what I say.** Never split the difference, and never quietly deliver the old decision while
+describing it as the new one.
+
 ## Working style: discuss design forks; don't self-authorize commits/pushes
 
 When building, if you find yourself **choosing between viable approaches** — a design fork, a

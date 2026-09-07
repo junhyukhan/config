@@ -43,6 +43,11 @@ carries the old "never commit or push" wording.
   - [`decisions/agent-authored-output.md`](decisions/agent-authored-output.md) — agents publish
     under Han's own GitHub identity, must attribute what he did not write, and write by linking
     rather than restating.
+  - [`decisions/agents-md-is-a-prompt.md`](decisions/agents-md-is-a-prompt.md) — AGENTS.md is
+    unenforced text loaded every session, so a rule gets one line and its reasoning goes in a record.
+  - [`decisions/past-decisions-are-not-orders.md`](decisions/past-decisions-are-not-orders.md) — a
+    record that contradicts what Han is asking now must be **named and asked about**, never silently
+    obeyed. His current instruction is rank 0; records are history.
   - [`decisions/artifact-checking.md`](decisions/artifact-checking.md) — why "verify against the
     artifact" stays a disposition in `AGENTS.md`, with concrete checks at their points of use.
   - [`decisions/grill-and-decide-skills.md`](decisions/grill-and-decide-skills.md) — what was
