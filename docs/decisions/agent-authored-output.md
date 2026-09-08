@@ -36,6 +36,46 @@ pending Han's review. `repos/ops/orchestrator.py`'s brief still does not carry i
 
 ## Discussion
 
+### Amendment 2026-09-08 — the comment footer, settled
+
+**The open item below is closed.** A dispatched review session reviewing PR #51 hit exactly the
+gap this record named: it had findings ready, refused to invent a footer because this record told
+it not to, and stopped to ask. That is the rule working, and it is also the second time the
+question has blocked real work — so it is answered rather than deferred again.
+
+> **Verbatim (Han, 2026-09-08):** "Review - what are the options for comment attribution?" …
+> "Yup your recs are good for both"
+
+Four options were put to him: a footer mirroring the commit convention; a short inline prefix; a
+one-line footer with no link; or not posting to GitHub at all and keeping findings in a repo record
+he cites himself. He took the first, with the addition below.
+
+**The format:**
+
+```
+🤖 Review by Claude Opus 5 — dispatched review session, independent of the session that wrote this PR — via [Claude Code](https://claude.com/claude-code)
+https://claude.ai/code/session_<id>
+```
+
+**Why a footer and not a prefix.** Commits already end with `Co-Authored-By` plus `Claude-Session`.
+One attribution idiom across commits, PR bodies and comments means a reader learns it once, and a
+script looking for agent-authored output has one shape to match rather than three.
+
+**The load-bearing addition is "independent of the session that wrote this PR", and it is not a
+disclaimer.** It is the most useful fact in the footer: it distinguishes a review from an author
+marking their own homework. On PR #51 that distinction was the entire point of dispatching a
+separate session, and without it the comment reads as the author agreeing with themselves. Where a
+comment is *not* from an independent session, that clause must be dropped rather than reused — it
+is a claim, and a false one would be worse than no footer.
+
+**Each session uses its own session URL, or omits the line.** Reusing another session's link is a
+wrong provenance pointer, which is worse than an absent one — the whole reason the link is there is
+that a reader can reach the transcript that produced the text.
+
+**Not settled here:** whether a comment an agent posts on Han's behalf that is *not* review output —
+a reply in a thread, a status note — takes the same footer. Nothing has needed one yet; when one
+does, it amends this section rather than inventing a second format.
+
 ### What triggered it
 
 A dispatched `repos/review` session posted an 8.7k-character review to PR #3 with `gh`. GitHub
@@ -102,9 +142,10 @@ right place* was adopted.
 - **Wired 2026-09-06**, as a `## What you publish` section in
   [`../../claude/.claude/AGENTS.md`](../../claude/.claude/AGENTS.md) citing this record. The edit is
   uncommitted; Han decides whether it lands.
-- **What an attribution footer on a comment should say** is undecided — agent name, dispatch, session
-  link is the obvious shape, but nothing has been settled or applied. The PR #3 comment stands
-  unattributed by Han's decision to keep it.
+- ~~**What an attribution footer on a comment should say** is undecided~~ — **SETTLED 2026-09-08**,
+  see the amendment at the top of this Discussion. The shape guessed here (agent name, dispatch,
+  session link) was close; what it missed is that naming the session's *independence* is the useful
+  part. The PR #3 comment still stands unattributed by Han's decision to keep it.
 - **The dispatch brief still says the old rule.** `repos/ops/orchestrator.py` tells every session
   *"never commit or push on Han's behalf"* and is silent on publishing, which is how the PR comment
   happened. The `AGENTS.md` wiring above reaches a dispatched session only if it reads the global

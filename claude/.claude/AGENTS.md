@@ -97,8 +97,17 @@ on a Claude subscription. Because we share the identity, nothing in the author f
 writing from mine, so the text has to carry it.
 
 **Attribute anything you wrote that I did not.** Commits already do, with `Co-Authored-By` and a
-session link. **Comments are the gap, and what their attribution should say is still open** — do not
-invent a footer, ask me.
+session link. Comments take a footer (settled 2026-09-08, `docs/decisions/agent-authored-output.md`):
+
+```
+🤖 Review by Claude Opus 5 — dispatched review session, independent of the session that wrote this PR — via [Claude Code](https://claude.com/claude-code)
+https://claude.ai/code/session_<id>
+```
+
+Use **your own** session URL, or omit that line — another session's link is a wrong provenance
+pointer, which is worse than none. The independence clause is a claim, not boilerplate: drop it when
+you are not a separate session from the author. For a comment that is not review output, ask me
+rather than adapting this.
 
 **Each artifact says only what it owns, and links for the rest.** The record owns *why*, the commit
 owns *what changed*, the PR owns *what a reviewer needs in order to decide*, the backlog owns *what
