@@ -30,6 +30,16 @@ import json
 def is_secret_name(name: str) -> bool:
     if name.endswith(".example"):        # templates are always fine
         return False
+    # `.env.public` declares itself non-secret, and duri-v3 uses it for the two
+    # NEXT_PUBLIC_* values Next inlines into the CLIENT bundle at build time —
+    # i.e. values anyone can already download. Guarding them made them look
+    # sensitive AND made the secret file they used to live in undeletable, since
+    # deploy-duri.sh read its build args from it.
+    #
+    # EXACT match, not a prefix: `.env.production` must stay guarded, and it
+    # would pass a `.startswith(".env.pub")` test.
+    if name == ".env.public":
+        return False
     if name == ".env":
         return True
     if name.startswith(".env."):         # .env.local, .env.hosted, .env.production...

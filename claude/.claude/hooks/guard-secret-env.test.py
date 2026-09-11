@@ -37,6 +37,14 @@ CASES = [
     # The real push script must still work — it exports to a file.
     ("scripts/push-duri-env.sh --dry-run", False),
 
+    # --- .env.public is declared non-secret; near-misses are NOT ---
+    ("cat .env.public", False),
+    ("grep NEXT_PUBLIC_SUPABASE_URL .env.public", False),
+    ("cat duri-v3/.env.public", False),
+    ("cat .env.production", True),      # prefix-match would wrongly allow this
+    ("cat .env.public.local", True),    # only the exact name is exempt
+    ("cat .env.publickey", True),
+
     # --- the pre-existing file rules must still hold ---
     ("cat .env.hosted", True),
     ("cp .env.local /tmp/x", False),
