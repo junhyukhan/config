@@ -60,6 +60,42 @@ READER = re.compile(
 SEG_SPLIT = re.compile(r"\|\||&&|[|;&\n]")
 
 
+# --- Infisical -------------------------------------------------------------
+# Added 2026-09-12, after a dispatched security review found that migrating
+# duri's secrets to Infisical had SILENTLY REMOVED a protection this hook used
+# to provide. `cat .env.hosted` was blocked; `infisical export`, which prints
+# the exact same values to stdout, was not — because every rule above matches a
+# *filename*, and Infisical has no file to match. The guard has to follow the
+# secrets, not the storage format.
+#
+# Safe by construction and deliberately NOT matched:
+#   infisical export --output-file=PATH   writes to disk, prints nothing
+#   infisical secrets set|delete          writes; `set --file=` is the import path
+#   infisical run -- <app>                injects into the child's env
+#   infisical login | init | vault        no values
+INFISICAL_EXPORT = re.compile(r"\binfisical\b[^|;&]*\bexport\b")
+INFISICAL_OUTFILE = re.compile(r"--output-file(?:[= ]|$)")
+INFISICAL_SECRETS = re.compile(r"\binfisical\b[^|;&]*\bsecrets\b")
+INFISICAL_SECRETS_WRITE = re.compile(r"\bsecrets\s+(?:set|delete)\b")
+# `infisical run -- env` dumps the injected environment; so do printenv and a
+# bare `set`. The wrapped command is the thing that prints, not infisical.
+INFISICAL_RUN_DUMPS = re.compile(
+    r"\binfisical\b[^|;&]*\brun\b[^|;&]*--\s+(?:env|printenv|set)\b"
+)
+
+
+def infisical_dumps_secret(cmd: str):
+    """Why a value, not a bool: the caller reports WHICH command was refused."""
+    for seg in SEG_SPLIT.split(cmd):
+        if INFISICAL_EXPORT.search(seg) and not INFISICAL_OUTFILE.search(seg):
+            return "infisical export (no --output-file)"
+        if INFISICAL_SECRETS.search(seg) and not INFISICAL_SECRETS_WRITE.search(seg):
+            return "infisical secrets"
+        if INFISICAL_RUN_DUMPS.search(seg):
+            return "infisical run -- env"
+    return None
+
+
 def _seg_reads_secret(seg: str):
     for m in ENVFILE.finditer(seg):
         name = os.path.basename(m.group(0))
@@ -84,6 +120,19 @@ def bash_dumps_secret(cmd: str):
         if hit:
             return hit
     return None
+
+
+def deny_infisical(what: str):
+    sys.stderr.write(
+        f"BLOCKED: `{what}` prints secret VALUES to stdout, which puts them into "
+        f"context or a loggable console. Infisical is the source of truth as of "
+        f"2026-09-12, so the old file-based guard does not cover it.\n"
+        f"  To move values:   infisical export --output-file=<path>   (file-to-file)\n"
+        f"  To see key NAMES: infisical export --output-file=/tmp/x && "
+        f"grep -oE '^[A-Z_]+' /tmp/x\n"
+        f"  To compare without printing: hash the values inside a script.\n"
+    )
+    sys.exit(2)
 
 
 def deny(name: str, how: str):
@@ -119,6 +168,9 @@ def main():
         hit = bash_dumps_secret(cmd)
         if hit:
             deny(hit, "This command")
+        inf = infisical_dumps_secret(cmd)
+        if inf:
+            deny_infisical(inf)
 
     sys.exit(0)
 
