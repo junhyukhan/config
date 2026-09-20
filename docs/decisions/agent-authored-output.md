@@ -36,6 +36,36 @@ pending Han's review. `repos/ops/orchestrator.py`'s brief still does not carry i
 
 ## Discussion
 
+### Amendment 2026-09-18 — the session URL comes out, and a relayed review says so in the footer
+
+> **Verbatim (Han, 2026-09-18, on the footer of a review comment about to be posted):** "Btw the
+> session url in the comment isnt necessary as that isnt something that will last"
+
+**The link is dropped, not made optional.** The 2026-09-08 amendment below already permitted omitting
+it — *"each session uses its own session URL, or omits the line"* — on the reasoning that a reader can
+reach the transcript that produced the text. Han's point is that the premise is wrong: the URL does
+not last, so it is a pointer that decays into noise on an artifact that does. A comment on a PR
+outlives the session that wrote it by design. So the footer now ends at the `via [Claude Code]` line
+and carries no URL.
+
+**What this does not change.** The attribution itself stays, and so does the independence clause as a
+claim that must be true. Commits keep both their `Co-Authored-By` and their `Claude-Session:` trailer:
+a commit trailer is metadata a reader can ignore, and the session id is still the only key that joins
+a commit to the run that produced it, which the orchestrator record leans on.
+
+**A third shape appeared the same day and is now covered: a relayed review.** Under
+`repos/docs/decisions/session-orchestration.md` §"Amendment 2026-09-18", review findings leave the
+repo as a file and the *orchestrating* session posts them. So the session that publishes is neither
+the author of the PR nor the author of the findings. Posted on `duri-v3` #57:
+
+```
+🤖 Findings by a dispatched review session, independent of the session that wrote this PR, relayed and re-checked by the orchestrating session — via [Claude Code](https://claude.com/claude-code)
+```
+
+That says three true things — who found it, that they were independent of the author, and that the
+poster checked it rather than passing it through blind. Use it when relaying; use the plain review
+footer when the reviewing session posts its own findings.
+
 ### Amendment 2026-09-08 — the comment footer, settled
 
 **The open item below is closed.** A dispatched review session reviewing PR #51 hit exactly the
