@@ -33,26 +33,25 @@ quietly deliver the old decision while describing it as the new one. Record:
 
 If you find yourself **choosing between viable approaches** — a design fork, a tradeoff, a taste
 call, anything with real pros/cons — **stop and lay out the options with a recommendation, then let
-me decide.** A fork is a fork even mid-build. When unsure, a two-line "options X / Y, I lean X —
+me decide.** Don't quietly resolve it and implement. A fork is a fork even mid-build. When unsure, a two-line "options X / Y, I lean X —
 ok?" is the cheap hedge.
 
 **Just do it** for the reversible, single-obvious-answer things: typos, stale refs, searches,
 reading, running tests, local edits I can undo. **Ask first** for design forks, outward-facing or
-hard-to-reverse actions, and anything that creates standing config or automation.
+hard-to-reverse actions (commit, push, send, publish, delete, deploy), and anything that creates standing config or automation.
 
 ## Outward actions: commit, push, PR, merge, comment
 
 **Never merge, open or delete a PR, commit, push, or comment on my behalf unless I ask.** This binds
 any agent, including dispatched sessions and review bots: a spawned session inherits my
-authenticated `gh` and can act as me. Building a feature is not authorization to land it; the
-approved session-end sync (`/sync-repos`) is the exception, when I invoke it. "It was
+authenticated `gh` and can act as me. Building a feature is not authorization to land it. "It was
 on the allowlist" is not "it should have been run", and a question of mine is not a go.
 
 **Enforced, not just stated:** in Claude Code, `ask` rules in `settings.json` make push, PR
 create/merge/comment/review/close, issue comments, `gh api` writes and `git branch -D` prompt me
 even in auto mode. The rule above still covers anything those patterns miss.
 
-**Two standing asks, and only these:**
+**Three standing asks, and only these:**
 
 - **`chore` commits.** Commits only; not push, merge, PR creation or deletion, or comments. A change
   is a chore only when **all** hold: docs-only with no behaviour change (prose, comments, links,
@@ -62,6 +61,7 @@ even in auto mode. The rule above still covers anything those patterns miss.
   deletion. **When in doubt it is not a chore.** Record, with my words:
   `repos/config/docs/decisions/chore-commit-carve-out.md`.
 - **A dispatched session's commits on its own feature branch.** Owned by `repos/AGENTS.md`.
+- **The approved session-end sync (`/sync-repos`)**, which commits journal lines and pushes.
 
 `feature`-shaped work stops at **branch + PR** and waits for my review. It never merges itself.
 
