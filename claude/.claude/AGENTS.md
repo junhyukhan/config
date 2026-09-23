@@ -48,11 +48,12 @@ any agent, including dispatched sessions and review bots: a spawned session inhe
 authenticated `gh` and can act as me. Building a feature is not authorization to land it. "It was
 on the allowlist" is not "it should have been run", and a question of mine is not a go.
 
-**Enforced, not just stated:** in Claude Code, `ask` rules in `settings.json` make push, PR
-create/merge/comment/review/close, issue comments, `gh api` writes and `git branch -D` prompt me
-even in auto mode. The rule above still covers anything those patterns miss.
+**Enforced for dispatched Claude sessions:** the orchestrator starts them with `ask` rules
+(`dispatched-settings.json`) that make push, PR create/merge/comment/review/close, issue comments,
+`gh api` writes and `git branch -D` prompt, even in auto mode. Interactive sessions don't load it:
+there, my answer in chat is the gate. The rule above still covers anything those patterns miss.
 
-**Three standing asks, and only these:**
+**Four standing asks, and only these:**
 
 - **`chore` commits.** Commits only; not push, merge, PR creation or deletion, or comments. A change
   is a chore only when **all** hold: docs-only with no behaviour change (prose, comments, links,
@@ -63,6 +64,8 @@ even in auto mode. The rule above still covers anything those patterns miss.
   `repos/config/docs/decisions/chore-commit-carve-out.md`.
 - **A dispatched session's commits on its own feature branch.** Owned by `repos/AGENTS.md`.
 - **The approved session-end sync (`/sync-repos`)**, which commits journal lines and pushes.
+- **Work I ask for, in a session I'm in, that ends in a PR:** committing, pushing and opening
+  the PR for it. Merge stays mine.
 
 `feature`-shaped work stops at **branch + PR** and waits for my review. It never merges itself.
 

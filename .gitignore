@@ -11,6 +11,7 @@ credentials*.json
 # Ignore everything under the package, then whitelist tracked configs.
 claude/.claude/*
 !claude/.claude/settings.json
+!claude/.claude/dispatched-settings.json
 !claude/.claude/commands/
 !claude/.claude/hooks/
 !claude/.claude/skills/
