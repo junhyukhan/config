@@ -1,6 +1,6 @@
 ---
 name: absence
-description: Before reporting that something is missing, unused, not configured, or not there — prove the probe could have found it. Use whenever a grep, log read, query, scan or port check comes back empty and that emptiness is about to become a claim, a recommendation to delete or disable, or evidence that a thing does not exist.
+description: Before reporting that something is missing, unused, not configured, or not there — prove the probe could have found it. Use whenever a grep, log read, query, scan, port check or ls comes back empty or fails — an error, a missing path, a non-zero exit — and that result is about to become a claim, a recommendation to delete or disable, or evidence that a thing does not exist.
 ---
 
 # Absence
