@@ -35,6 +35,38 @@ Answering how the standing no-commit rule squares with unattended agent work:
 
 ## Discussion
 
+### Amendment 2026-09-24 — the mechanical gate is for dispatched sessions; a PR-bound ask covers commit, push and PR
+
+> **Verbatim (Han, 2026-09-24):** "btw our allowlist seems to have git commit on both allow and ask.
+> during our session, you kept asking for my permission for commits, comments, push, pr.
+> i already allowed for this and since this is auto mode i expect no questions. how should i set this up"
+
+> **Verbatim (Han, 2026-09-24, choosing option A of three):** "A, and add the standing grant"
+
+**This overturns part of 2026-09-23.** The docs refactor's PR 1 (`repos/docs/decisions/docs-budget-refactor.md`)
+put `ask` rules for push, PR, merge, comment, `gh api` writes and `git branch -D` into the global
+`settings.json`, so they prompted in every session. `ask` always wins over `allow`, so no answer in
+chat and no "allow for this session" could get past them, and Han was prompted for actions he had
+already asked for.
+
+**Now:** the same rules live in `claude/.claude/dispatched-settings.json`, and the orchestrator starts
+dispatched sessions with `--settings` pointing at it. The risk the rule names, a spawned session
+acting as Han through his `gh`, is exactly the dispatched case. Interactive sessions do not load the
+file: there Han is watching, and his answer in chat is the gate. Checked headless on 2026-09-24:
+the same approved `git push` runs without the file and is denied with it. The cost Han accepted: a
+pane opened by hand, not through the orchestrator, has no mechanical gate.
+
+**The standing grant.** The chat questions came from the written rule, not the settings: whenever an
+ask did not plainly cover the next step, the agent stopped. A fourth standing ask now says that work
+Han asks for that ends in a PR covers committing, pushing and opening the PR for it. Merge stays his.
+
+The allow-side `git commit` entry Han saw was not in any settings file. It is most likely an
+in-memory "allow for this session" approval; no file was changed for it.
+
+Options not taken: B, narrow the gate everywhere to merge, comment, `gh api` writes and branch
+deletion; C, remove the gate and rely on the written rule and the auto-mode classifier, the state
+in which an unasked PR comment was posted.
+
 ### Amendment 2026-09-05 — the gate covers every outward action, and every agent
 
 > **Verbatim (2026-09-05):** "you're right. merge, mr creation/deletion, commits, push, comments,etc
