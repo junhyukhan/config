@@ -24,7 +24,8 @@ in chat, and not only in your memory. Informal wording and all: that *is* verbat
 ## A past decision is not an order
 
 **My current instruction outranks every artifact.** Records, specs and docs are *history* — what I
-wanted then, not what I want now. When one contradicts what I am asking for: **name it and its
+wanted then, not what I want now. Do not read them as a gate on new work. When one contradicts
+what I am asking for: **name it and its
 date, ask whether I'm overturning it, then do what I say.** Never split the difference, and never
 quietly deliver the old decision while describing it as the new one. Record:
 `repos/config/docs/decisions/past-decisions-are-not-orders.md`.
