@@ -92,18 +92,8 @@ uninstall claude` removes it. Tracking it would mean owning a vendor file that g
 `setup.sh` installs herdr and its integration instead, which is what makes the tracked
 `settings.json` reference to that hook valid on a new machine.
 
-**`brew bundle dump` rewrites `vscode` entries from live state, so it can delete them.** It emits
-exactly what `code --list-extensions` reports. VS Code currently has **none** — the extensions in
-daily use are in **Cursor**, and Homebrew Bundle has no directive for Cursor, so `brew bundle`
-cannot capture or restore them. A dump therefore wipes the `vscode` block. Always verify a re-dump
-with a set comparison rather than eyeballing the diff:
-
-```bash
-comm -23 <(git show HEAD:mac/Brewfile | grep -E '^(tap|brew|cask|vscode|go|npm) ' | sort) \
-         <(grep -E '^(tap|brew|cask|vscode|go|npm) ' mac/Brewfile | sort)
-```
-
-Anything it prints was dropped.
+**`brew bundle dump` can delete `vscode` entries.** Verify every re-dump with the set comparison in
+[`docs/README.md`](docs/README.md) §Reference.
 
 **Package management**:
 - macOS: `mac/Brewfile` with `brew bundle`
@@ -128,17 +118,8 @@ Anything it prints was dropped.
 
 ## Agent tooling (workspace scaffolding)
 
-Beyond dotfiles, this repo carries tooling for the `~/workdir/repos` agent workflow:
-
-- **`templates/`** — canonical `AGENTS.md.tmpl` + `CLAUDE.md.tmpl` for a new project repo,
-  plus `docs-README.md.tmpl` + `decision.md.tmpl` for the standard `docs/` shape.
-- **`scripts/new-repo.sh <dir>`** — scaffolds those templates into a new repo (filled with
-  its name): `AGENTS.md`, `CLAUDE.md`, `docs/README.md`, `docs/decisions/TEMPLATE.md`. It
-  skips files that already exist, then prints the steps to wire the repo into the workspace
-  meta-repo (`repos/.gitignore` line + `repos/AGENTS.md` table row). Keeps every new project
-  on the standard agent-context shape.
-- **`claude/.claude/skills/`** — the versioned home for personal global Claude skills
-  (see its `README.md`).
+`templates/`, `scripts/new-repo.sh` and `claude/.claude/skills/`: see
+[`docs/README.md`](docs/README.md) §Reference.
 
 ### Legacy
 
