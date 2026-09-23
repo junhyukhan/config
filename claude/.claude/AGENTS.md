@@ -48,10 +48,10 @@ any agent, including dispatched sessions and review bots: a spawned session inhe
 authenticated `gh` and can act as me. Building a feature is not authorization to land it. "It was
 on the allowlist" is not "it should have been run", and a question of mine is not a go.
 
-**Enforced for dispatched sessions:** the orchestrator starts them with `ask` rules
+**Enforced for dispatched Claude sessions:** the orchestrator starts them with `ask` rules
 (`dispatched-settings.json`) that make push, PR create/merge/comment/review/close, issue comments,
 `gh api` writes and `git branch -D` prompt, even in auto mode. Interactive sessions don't load it:
-there, my answer in chat is the gate.
+there, my answer in chat is the gate. The rule above still covers anything those patterns miss.
 
 **Four standing asks, and only these:**
 
@@ -64,8 +64,8 @@ there, my answer in chat is the gate.
   `repos/config/docs/decisions/chore-commit-carve-out.md`.
 - **A dispatched session's commits on its own feature branch.** Owned by `repos/AGENTS.md`.
 - **The approved session-end sync (`/sync-repos`)**, which commits journal lines and pushes.
-- **Work I ask for that ends in a PR:** committing, pushing and opening the PR for it. Merge
-  stays mine.
+- **Work I ask for, in a session I'm in, that ends in a PR:** committing, pushing and opening
+  the PR for it. Merge stays mine.
 
 `feature`-shaped work stops at **branch + PR** and waits for my review. It never merges itself.
 

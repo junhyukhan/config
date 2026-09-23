@@ -60,8 +60,15 @@ pane opened by hand, not through the orchestrator, has no mechanical gate.
 ask did not plainly cover the next step, the agent stopped. A fourth standing ask now says that work
 Han asks for that ends in a PR covers committing, pushing and opening the PR for it. Merge stays his.
 
-The allow-side `git commit` entry Han saw was not in any settings file. It is most likely an
-in-memory "allow for this session" approval; no file was changed for it.
+No settings file has a `git commit` rule. The allow side Han saw is most likely an in-memory
+"allow for this session" approval. The ask side is most likely a false positive, unconfirmed:
+`Bash(git * push *)` also matches a commit whose message contains " push ", which several of this
+session's commit messages did. Dispatched sessions keep that false positive on the commits they
+are allowed to make; it is on the refactor contract's parked list.
+
+**Merge order, from the PR #7 reviews.** The gate now needs both halves: this file, and the
+orchestrator that passes it. Land agentlab's `feat/dispatch-settings` first or at the same time.
+The other order leaves dispatched sessions ungated with nothing reporting it.
 
 Options not taken: B, narrow the gate everywhere to merge, comment, `gh api` writes and branch
 deletion; C, remove the gate and rely on the written rule and the auto-mode classifier, the state
