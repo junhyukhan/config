@@ -13,7 +13,13 @@ if [[ "$OSTYPE" == darwin* ]]; then
         exit 1
     fi
     echo "Installing Homebrew packages..."
-    brew bundle --file="$REPO_DIR/mac/Brewfile"
+    # One failed package (a network blip, a cask checksum mismatch) must not stop the
+    # config links below from being made. Warn, carry on, and remind at the end;
+    # every step here is idempotent, so a re-run retries only what failed.
+    if ! brew bundle --file="$REPO_DIR/mac/Brewfile"; then
+        BUNDLE_FAILED=1
+        echo "WARNING: some Brewfile packages failed to install. Continuing so the configs still get linked."
+    fi
 
 elif [[ -f /etc/fedora-release ]]; then
     echo "Installing dnf packages..."
@@ -113,6 +119,10 @@ fi
 # Report it instead, so a fresh machine surfaces the gap rather than hiding it.
 if ! command -v claude &>/dev/null; then
     echo "NOTE: Claude Code is not installed. See https://claude.com/product/claude-code"
+fi
+
+if [[ -n "${BUNDLE_FAILED:-}" ]]; then
+    echo "WARNING: some Homebrew packages failed earlier. Re-run ./setup.sh to retry them."
 fi
 
 echo "Done! Restart your shell to apply changes."

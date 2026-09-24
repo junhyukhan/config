@@ -25,7 +25,10 @@
    cd ~/workdir/repos/config && ./setup.sh
    ```
    That installs the core Brewfile, sets zsh, stows every package and installs Herdr with its
-   Claude Code integration.
+   Claude Code integration. **Run it before opening Ghostty or Zed:** each writes a default config
+   on first launch, and Stow will not overwrite a file it does not own. If one is already open,
+   delete `~/.config/ghostty/config` or `~/.config/zed/settings.json` and re-run. If a package fails
+   to install, the script warns and carries on; re-run it to retry.
 3. **Install what the Brewfile does not carry**:
    - Tailscale, from its own package installer at pkgs.tailscale.com.
    - Amphetamine and Bitwarden, from the App Store.
