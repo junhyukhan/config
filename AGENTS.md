@@ -3,7 +3,7 @@ workspace:
   readfirst: docs/README.md
   decisions: docs/decisions/
   backlog: []
-  verify: stow -n -R -t "$HOME" shell nvim ghostty vim git tmux && stow -n -R --no-folding -t "$HOME" claude codex
+  verify: stow -n -R -t "$HOME" shell nvim ghostty vim git tmux && stow -n -R --no-folding -t "$HOME" claude codex herdr zed
   autonomy: chore
 ---
 
@@ -95,9 +95,8 @@ uninstall claude` removes it. Tracking it would mean owning a vendor file that g
 **`brew bundle dump` can delete `vscode` entries.** Verify every re-dump with the set comparison in
 [`docs/README.md`](docs/README.md) §Reference.
 
-**Package management**:
-- macOS: `mac/Brewfile` with `brew bundle`
-- Fedora: `fedora/packages.txt` with `dnf install`
+**Package management:** macOS `mac/Brewfile` (the core every new Mac gets; see `docs/new-mac.md`), Fedora
+`fedora/packages.txt`.
 
 ## Stow Packages
 
@@ -109,6 +108,7 @@ uninstall claude` removes it. Tracking it would mean owning a vendor file that g
 | vim | `~/.vimrc` |
 | claude | `~/.claude/` — `settings.json`, `AGENTS.md` + `CLAUDE.md` (global agent instructions), `commands/*` (slash commands), `hooks/*` (e.g. `guard-secret-env.py`), `skills/*` (global skills) — all via `--no-folding` |
 | cloudflared | `~/.cloudflared/config.yml` (Fedora only, auto-stowed on Fedora) |
+| herdr, zed | `~/.config/herdr/config.toml`, `~/.config/zed/settings.json` — settings only, via `--no-folding` |
 
 > The `claude` package is this repo's **agent-config home**: everything under
 > `~/.claude` that should be versioned + portable (settings, the global `AGENTS.md`,

@@ -25,3 +25,11 @@ claude/.claude/*
 # instruction file, two harnesses. Don't replace it with a copy.
 codex/.codex/*
 !codex/.codex/AGENTS.md
+
+# herdr and zed write runtime state beside their settings (herdr: sockets, logs,
+# session.json). Both packages are stowed --no-folding so that state stays in ~,
+# and these whitelists make sure only the settings file can ever be tracked.
+herdr/.config/herdr/*
+!herdr/.config/herdr/config.toml
+zed/.config/zed/*
+!zed/.config/zed/settings.json

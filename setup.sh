@@ -64,6 +64,10 @@ stow -R --no-folding -t "$HOME" claude
 # very likely running with no global instructions at all.
 stow -R --no-folding -t "$HOME" codex
 
+# herdr and zed: --no-folding for the same reason -- ~/.config/herdr holds herdr's
+# sockets, logs and session.json. Only each tool's settings file is tracked.
+stow -R --no-folding -t "$HOME" herdr zed
+
 # cloudflared is only used on Fedora
 if [[ -f /etc/fedora-release ]]; then
     stow -R -t "$HOME" cloudflared
