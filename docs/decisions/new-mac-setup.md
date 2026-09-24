@@ -37,6 +37,8 @@ generated: { by: claude/opus-5.5, at: 2026-09-25T00:00:00Z }
 
 > **Verbatim (Han, 2026-09-25, final cut):** "no i don't want mas, vorsaint"
 
+> **Verbatim (Han, 2026-09-25, after editing the Brewfile himself):** "i edited the brefile. removed some manually. removed the extentions as well as those can be installed later"
+
 ## Discussion
 
 ### What was found
@@ -56,7 +58,8 @@ SSH config.
   homelab left k3s), the `bun` and `supabase` taps, and the one-off apps Steam, balenaEtcher, Brave,
   DBeaver and DevToys. They stay installed on this Mac. **In:** Ghostty, Firefox, Chrome, Claude,
   Zed, Raycast, BetterTouchTool, Obsidian, Windscribe, `node`, and `infisical` from its vendor tap.
-  The VS Code extensions stay, by Han's call.
+- **Han's own edit, the same day:** he removed Logi Options+ and all eleven VS Code extensions,
+  which "can be installed later". This overturns his earlier "keep the vs code extensions".
 - **`mas` and Vorssaint are out**, by Han's call. Amphetamine and Bitwarden are manual App Store
   installs listed in the runbook.
 - **Tailscale uses its own package installer**, as Tailscale recommends, and is a runbook step

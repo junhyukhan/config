@@ -68,8 +68,6 @@ cask "google-chrome"
 cask "iina"
 # Blocks all Keyboard and TouchBar input
 cask "keyboardcleantool"
-# Software for Logitech devices
-cask "logi-options+"
 # Knowledge base that works on top of a local folder of plain text Markdown files
 cask "obsidian"
 # Replacement for Docker Desktop
@@ -84,18 +82,3 @@ cask "windscribe"
 cask "zed"
 go "golang.org/x/tools/gopls"
 npm "pnpm"
-
-# VS Code extensions -- a 2026-04-03 snapshot, kept deliberately (Han, 2026-09-25).
-# `brew bundle dump` emits only what `code --list-extensions` reports, so a dump on a
-# machine where VS Code has none would delete these. See docs/README.md §Reference.
-vscode "anthropic.claude-code"
-vscode "astro-build.astro-vscode"
-vscode "esbenp.prettier-vscode"
-vscode "ms-azuretools.vscode-containers"
-vscode "ms-python.debugpy"
-vscode "ms-python.python"
-vscode "ms-python.vscode-pylance"
-vscode "ms-python.vscode-python-envs"
-vscode "ms-vscode-remote.remote-containers"
-vscode "ms-vscode.makefile-tools"
-vscode "pkief.material-icon-theme"

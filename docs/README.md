@@ -93,7 +93,8 @@ comm -23 <(git show HEAD:mac/Brewfile | grep -E '^(tap|brew|cask|vscode|go|npm) 
          <(grep -E '^(tap|brew|cask|vscode|go|npm) ' mac/Brewfile | sort)
 ```
 
-Anything it prints was dropped.
+Anything it prints was dropped. (Since 2026-09-25 the Brewfile carries no `vscode` entries, so this no
+longer bites; it applies again if any are added back.)
 
 ### Agent tooling (workspace scaffolding)
 
