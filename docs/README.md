@@ -34,6 +34,9 @@ carries the old "never commit or push" wording.
 
 ## Index
 
+- **[`new-mac.md`](new-mac.md)** — setting up a new Mac: what `setup.sh` does, what it can't, and the
+  order to do the rest in. Why: [`decisions/new-mac-setup.md`](decisions/new-mac-setup.md).
+
 - **`decisions/`** — design decisions & specs, one file per topic, each a **verbatim ask +
   Discussion** (copy `decisions/TEMPLATE.md` to start one). The append-only record of *why*
   things are the way they are.
