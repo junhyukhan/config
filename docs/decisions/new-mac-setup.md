@@ -75,6 +75,35 @@ SSH config.
 
 ### Open
 
-- **What the Mac mini is for.** A replacement main machine needs only the runbook. A second,
-  always-on machine also needs power settings, a running Herdr server, and a rule for which machine
-  writes to which repo: the "machine-2 role" still open in `agentlab/docs/backlog.md`.
+- **How a new Mac gets the workspace.** Superseded 2026-09-26: the meta-repo layout is retired
+  and the mini is built from scratch. Record: `repos/docs/decisions/workspace-restart.md` in the
+  old `workspace` repo.
+
+## The Mac mini's role (2026-09-25)
+
+> **Verbatim (Han, 2026-09-25):** "btw my mac mini's purpose is to be a always on dev machine like
+> my current mbp. but i am unsure how to separate the two."
+
+> **Verbatim (Han, 2026-09-25, the pick):** "alright let's go with 1. give me the instructions to
+> make this happen right now"
+
+**Decision: the mini is the home, the MacBook is a client.** The repo checkouts, Claude's memory,
+the Herdr server and dispatched sessions live on the mini. The MacBook reaches it over Tailscale
+(SSH, Herdr, Claude remote control), as the phone already does, and no longer needs to stay awake.
+Offline, the laptop works on feature branches only and pushes them; it never commits to `main`.
+
+**Why option 1.** Claude's memory and `agentlab`'s dispatch state are per machine, the
+one-writer-per-repo rule cannot see across machines, and deploys, migrations and quant each need one
+owner. Only a single home needs no syncing. Rejected: 2, each repo owned by one machine (memories
+drift, cross-repo work is awkward); 3, both peers synced by git (the same, and the writer rule is
+unenforceable). The cost: laptop work needs the network, and a dev server is viewed through
+`ssh -L`.
+
+**Seeding: a fresh install, not a copy.** A copy of the MacBook's tree was proposed first; Han
+turned it down.
+
+> **Verbatim (Han, 2026-09-26):** "no but i want to just start my mac mini from scratch."
+
+Every repo is cloned from GitHub. What git does not hold is carried by hand or left behind: Claude's
+memory (one folder per repo started in, not only the root's), the two `.env` files, the Supabase
+token, `agentlab`'s local dispatch state and any repo's `settings.local.json`.
