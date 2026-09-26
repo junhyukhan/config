@@ -57,7 +57,7 @@ SSH config.
 - **Out of the Brewfile:** PyCharm and Antigravity, Ice, `gemini-cli`, `helm` and `kustomize` (the
   homelab left k3s), the `bun` and `supabase` taps, and the one-off apps Steam, balenaEtcher, Brave,
   DBeaver and DevToys. They stay installed on this Mac. **In:** Ghostty, Firefox, Chrome, Claude,
-  Zed, Raycast, BetterTouchTool, Obsidian, Windscribe, `node`, and `infisical` from its vendor tap.
+  Zed, Raycast, BetterTouchTool, Obsidian, Windscribe, `node`, and `infisical`.
 - **Han's own edit, the same day:** he removed Logi Options+ and all eleven VS Code extensions,
   which "can be installed later". This overturns his earlier "keep the vs code extensions".
 - **`mas` and Vorssaint are out**, by Han's call. Amphetamine and Bitwarden are manual App Store
@@ -72,6 +72,12 @@ SSH config.
   stowed `--no-folding`, and `~/.config/git/ignore` in the `git` package. None holds a secret; key
   names were checked before tracking. `gh`'s `hosts.yml`, which holds the GitHub token, is never
   tracked.
+
+- **`infisical` comes from homebrew/core, not the vendor tap (2026-09-26).** The tap failed on the
+  fresh mini. homebrew/core builds the same release from Infisical's GitHub source.
+
+  > **Verbatim (Han, 2026-09-26):** "can't we change the brewfile to use that one? but i thought the
+  > Brewfile already uses the official infisical method."
 
 ### Open
 
