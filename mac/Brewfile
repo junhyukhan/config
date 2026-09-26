@@ -2,7 +2,6 @@
 # out of this file and are simply installed there. Never run `brew bundle cleanup` against
 # it: that would uninstall everything else brew put on the machine. See docs/new-mac.md.
 
-tap "infisical/get-cli"
 # Clone of cat(1) with syntax highlighting and Git integration
 brew "bat"
 # Secure and free password manager for all of your devices
@@ -21,8 +20,8 @@ brew "fzf"
 brew "gh"
 # Open source programming language to build simple/reliable/efficient software
 brew "go"
-# The official Infisical CLI, from the vendor tap its docs recommend
-brew "infisical/get-cli/infisical"
+# The Infisical CLI, from homebrew/core (built from Infisical's source; the vendor tap failed on a fresh Mac)
+brew "infisical"
 # Ambitious Vim-fork focused on extensibility and agility
 brew "neovim"
 # Open-source, cross-platform JavaScript runtime environment
