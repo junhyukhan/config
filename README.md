@@ -21,12 +21,8 @@ config/
 │   └── .vimrc               # -> ~/.vimrc
 ├── claude/                   # Agent config (stowed with --no-folding)
 │   └── .claude/
-│       ├── settings.json     # -> ~/.claude/settings.json
-│       ├── AGENTS.md         # -> ~/.claude/AGENTS.md  (global agent instructions)
-│       ├── CLAUDE.md         # -> ~/.claude/CLAUDE.md  (thin @AGENTS.md import)
-│       ├── commands/         # -> ~/.claude/commands/   (slash commands)
-│       ├── hooks/            # -> ~/.claude/hooks/      (e.g. guard-secret-env.py)
-│       └── skills/           # -> ~/.claude/skills/     (global skills)
+│       ├── settings.json     # -> ~/.claude/settings.json  (gates, hooks, auto-mode context)
+│       └── hooks/            # -> ~/.claude/hooks/         (e.g. guard-secret-env.py)
 ├── cloudflared/
 │   └── .cloudflared/
 │       └── config.yml        # -> ~/.cloudflared/config.yml (dev gateway only)
@@ -174,6 +170,6 @@ Then commit and push.
 | **vim** | Basic vim config |
 | **Brewfile** | Homebrew packages and casks (macOS) |
 | **packages.txt** | dnf packages (Fedora) |
-| **claude** | Claude Code agent config: `settings.json`, global `AGENTS.md`, slash commands, hooks, skills |
+| **claude** | Claude Code guards: `settings.json` and the hooks it runs. No agent instructions or skills are tracked. |
 | **cloudflared** | Dev gateway tunnel config (Fedora only, auto-stowed by setup.sh) |
 | **templates + scripts** | `new-repo.sh` scaffolds the standard `AGENTS.md` / `CLAUDE.md` / `docs/` into a new workspace repo |
