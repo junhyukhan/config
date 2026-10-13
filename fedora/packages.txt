@@ -6,6 +6,7 @@ neovim
 tmux
 zsh
 git
+gh
 stow
 
 # Search & navigation
