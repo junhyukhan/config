@@ -3,7 +3,7 @@ workspace:
   readfirst: docs/README.md
   decisions: docs/decisions/
   backlog: []
-  verify: stow -n -R -t "$HOME" shell nvim ghostty vim git tmux && stow -n -R --no-folding -t "$HOME" claude codex herdr zed
+  verify: stow -n -R -t "$HOME" shell nvim ghostty vim git tmux && stow -n -R --no-folding -t "$HOME" claude herdr zed
   autonomy: chore
 ---
 
@@ -46,21 +46,16 @@ dnf repoquery --userinstalled --qf '%{name}' | sort > fedora/packages.txt
 
 ## Architecture
 
-**Symlink-based with GNU Stow**: Each top-level directory (shell, nvim, ghostty, vim, git, tmux, claude, codex, vscode, cloudflared) is a stow package. The directory structure inside each package mirrors the path relative to `$HOME`. Running `stow -t ~ <package>` creates symlinks accordingly.
+**Symlink-based with GNU Stow**: Each top-level directory (shell, nvim, ghostty, vim, git, tmux, claude, vscode, cloudflared) is a stow package. The directory structure inside each package mirrors the path relative to `$HOME`. Running `stow -t ~ <package>` creates symlinks accordingly.
 
-**One canonical global instruction file, every harness.** `claude/.claude/AGENTS.md` is the single
-source. `claude/.claude/CLAUDE.md` imports it with `@AGENTS.md`, and `codex/.codex/AGENTS.md` is a
-**symlink** to it — so Claude Code and Codex read the same rules. Do not replace that symlink with a
-copy, and do not add harness-specific rules to it; put those in the harness's own file below the
-import. Record: [`docs/decisions/codex-global-instructions.md`](docs/decisions/codex-global-instructions.md).
+**No agent instructions are tracked here.** Since 2026-10-10 the `claude` package carries only
+`settings.json` and the hooks it runs: the guards. The global `AGENTS.md`, `CLAUDE.md`, skills and
+slash commands were removed, and there is no `codex` package. A machine that still has them holds
+them as local files this repo does not manage.
 
 **Restowing / moving the repo**: Stow creates *relative* symlinks, so moving the repo directory breaks every link. To recover, re-run `./setup.sh` from the new location (it uses `stow -R`, which is idempotent and rebuilds the links).
 
-**`claude` package uses `--no-folding`**: Claude Code writes runtime state (`sessions/`, `jobs/`, `plugins/`, `history.jsonl`, logs, etc.) into `~/.claude`. If stow folds the whole directory into a single `~/.claude` symlink, all that runtime state lands inside this repo. `--no-folding` keeps `~/.claude` a real directory and symlinks only the tracked files (`settings.json`, `commands/*`). Runtime state is also ignored via `.gitignore` (`claude/.claude/*` with whitelisted configs).
-
-**`codex` package uses `--no-folding`** for the same reason as `claude`, more so: `~/.codex` holds
-`sessions/`, three SQLite databases with WAL sidecars, logs, caches, and plugins. The package tracks
-exactly one file, `AGENTS.md` (the symlink above); everything else under it is gitignored.
+**`claude` package uses `--no-folding`**: Claude Code writes runtime state (`sessions/`, `jobs/`, `plugins/`, `history.jsonl`, logs, etc.) into `~/.claude`. If stow folds the whole directory into a single `~/.claude` symlink, all that runtime state lands inside this repo. `--no-folding` keeps `~/.claude` a real directory and symlinks only the tracked files (`settings.json`, `hooks/*`). Runtime state is also ignored via `.gitignore` (`claude/.claude/*` with whitelisted configs).
 
 **`vscode` package is darwin-only and also uses `--no-folding`**, for both of the reasons above at
 once. Its path (`Library/Application Support/Code/User`) is macOS-specific — Fedora uses
@@ -106,19 +101,17 @@ uninstall claude` removes it. Tracking it would mean owning a vendor file that g
 | nvim | `~/.config/nvim/init.lua`, `~/.config/nvim/lazy-lock.json` |
 | ghostty | `~/.config/ghostty/config` |
 | vim | `~/.vimrc` |
-| claude | `~/.claude/` — `settings.json`, `AGENTS.md` + `CLAUDE.md` (global agent instructions), `commands/*` (slash commands), `hooks/*` (e.g. `guard-secret-env.py`), `skills/*` (global skills) — all via `--no-folding` |
+| claude | `~/.claude/` — `settings.json` (permission gates, hooks, auto-mode context) and `hooks/*` (`guard-secret-env.py`, `format-on-edit.py`) — via `--no-folding` |
 | cloudflared | `~/.cloudflared/config.yml` (Fedora only, auto-stowed on Fedora) |
 | herdr, zed | `~/.config/herdr/config.toml`, `~/.config/zed/settings.json` — settings only, via `--no-folding` |
 
-> The `claude` package is this repo's **agent-config home**: everything under
-> `~/.claude` that should be versioned + portable (settings, the global `AGENTS.md`,
-> slash commands, hooks, skills) lives in `claude/.claude/` and is Stow-linked. Add a
-> new hook/command/skill by dropping the file there and re-running `./setup.sh` (or
-> `stow -R --no-folding -t ~ claude`) — never hand-create the symlink.
+> The `claude` package holds what is enforced on every machine: `settings.json` and the hooks
+> it names. Add a hook by dropping the file in `claude/.claude/hooks/` and re-running
+> `./setup.sh` (or `stow -R --no-folding -t ~ claude`) — never hand-create the symlink.
 
 ## Agent tooling (workspace scaffolding)
 
-`templates/`, `scripts/new-repo.sh` and `claude/.claude/skills/`: see
+`templates/` and `scripts/new-repo.sh`: see
 [`docs/README.md`](docs/README.md) §Reference.
 
 ### Legacy
