@@ -1,15 +1,16 @@
 ---
 workspace:
   readfirst: docs/README.md
-  decisions: docs/decisions/
-  backlog: []
-  verify: stow -n -R -t "$HOME" shell nvim ghostty vim git tmux && stow -n -R --no-folding -t "$HOME" claude herdr zed
+  verify: stow -n -R -t "$HOME" shell nvim ghostty vim git tmux && stow -n -R --no-folding -t "$HOME" claude herdr zed && scripts/check-guards.sh
   autonomy: chore
 ---
 
 # AGENTS.md — config
 
 Guidance for any coding agent working in this repository.
+
+`autonomy: chore` (frontmatter) means an agent may commit a docs-only chore here without asking;
+anything else waits for Han.
 
 ## Overview
 
