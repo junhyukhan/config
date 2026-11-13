@@ -1,7 +1,7 @@
 ---
 workspace:
   readfirst: docs/README.md
-  verify: stow -n -R -t "$HOME" shell nvim ghostty vim git tmux && stow -n -R --no-folding -t "$HOME" claude herdr zed && scripts/check-guards.sh
+  verify: stow -n -R -t "$HOME" shell nvim ghostty vim git tmux && stow -n -R --no-folding -t "$HOME" claude zed && scripts/check-guards.sh
   autonomy: chore
 ---
 
@@ -79,14 +79,12 @@ machine ends up like this one, so every thing on it falls into exactly one of th
 | Kind | Where it goes | Test |
 |---|---|---|
 | Config **you wrote** | tracked in a stow package | would you be annoyed to rewrite it? |
-| **Tools** | declared in `setup.sh` — the Brewfile if brew carries it, a guarded install block if not (see herdr, powerlevel10k) | does a fresh machine need it present? |
+| **Tools** | declared in `setup.sh` — the Brewfile if brew carries it, a guarded install block if not (see Herdr, powerlevel10k) | does a fresh machine need it present? |
 | Files a **tool generates** | neither — they come back when the tool is installed | does the tool recreate it? |
 
-The third bucket is why `~/.claude/hooks/herdr-agent-state.sh` is *not* tracked even though the
-`hooks/` allowlist would take it: herdr writes it, herdr updates it, and `herdr integration
-uninstall claude` removes it. Tracking it would mean owning a vendor file that gets overwritten.
-`setup.sh` installs herdr and its integration instead, which is what makes the tracked
-`settings.json` reference to that hook valid on a new machine.
+Herdr is the third bucket: its app rewrites `~/.config/herdr-app/AGENTS.md`, the type files and
+its shipped layouts and mods on every start, so `setup.sh` installs Herdr rather than tracking them.
+Your own Herdr settings (`settings.json`, `keys.json`) are not tracked yet.
 
 **`brew bundle dump` can delete `vscode` entries.** Verify every re-dump with the set comparison in
 [`docs/README.md`](docs/README.md) §Reference.
@@ -104,7 +102,7 @@ uninstall claude` removes it. Tracking it would mean owning a vendor file that g
 | vim | `~/.vimrc` |
 | claude | `~/.claude/` — `settings.json` (permission gates, hooks, auto-mode context) and `hooks/*` (`guard-secret-env.py`, `format-on-edit.py`) — via `--no-folding` |
 | cloudflared | `~/.cloudflared/config.yml` (Fedora only, auto-stowed on Fedora) |
-| herdr, zed | `~/.config/herdr/config.toml`, `~/.config/zed/settings.json` — settings only, via `--no-folding` |
+| zed | `~/.config/zed/settings.json` — settings only, via `--no-folding` |
 
 > The `claude` package holds what is enforced on every machine: `settings.json` and the hooks
 > it names. Add a hook by dropping the file in `claude/.claude/hooks/` and re-running

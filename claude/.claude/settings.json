@@ -57,18 +57,6 @@
           }
         ]
       }
-    ],
-    "SessionStart": [
-      {
-        "matcher": "^(startup|resume|clear|compact|fork)$",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash \"$HOME/.claude/hooks/herdr-agent-state.sh\" session",
-            "timeout": 10
-          }
-        ]
-      }
     ]
   },
   "enableWorkflows": true,
@@ -127,7 +115,7 @@
       "### User-specific",
       "**Primary use of Claude Code**: software development (personal projects: dotfiles/workspace tooling, homelab, side apps)",
       "**Trusted repos**: the user's own repositories cloned under `~/workdir/repos`, each with its remote under https://github.com/junhyukhan/ — confidential material is fine only in the ones listed as Private under Repository visibility; content ported, repointed, or first read from outside this session's repo is not its own work. Visibility scopes confidential material only: secrets and sensitive data are never cleared into any repo by its visibility.",
-      "**Org-specific CLIs**: uv, npx, tailscale, herdr, stow, psql (personal toolchain observed in this project)"
+      "**Org-specific CLIs**: uv, npx, tailscale, hc (herdr-core), herdr-app, stow, psql (personal toolchain observed in this project)"
     ]
   },
   "voiceEnabled": true,

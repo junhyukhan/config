@@ -2,18 +2,66 @@
 type: Decision
 title: Phone → agent interaction (iPhone as a first-class control surface)
 description: >-
-  Herdr v0.8.2 is in production use since 2026-08-30 — phone sessions run inside it, and its CLI
-  drives agents, worktrees and notifications. The `claude rc` phone goal was already met.
+  Herdr TUI replaced by herdr-core (`hc`) + the Herdr app + the Herdr mobile app on 2026-11-13. The
+  phone reaches each machine's core over SSH; agents are driven with `hc`, worktrees live in the app,
+  and there is no notification CLI.
 status: draft
 tags: [config, phone, remote-control, herdr, tmux, multi-harness]
-generated: { by: claude/opus-5, at: 2026-08-28T00:00:00Z }
+generated: { by: claude/opus-5-5, at: 2026-11-13T00:00:00Z }
 ---
 
 # Phone → agent interaction (iPhone as a first-class control surface)
 
-**Status:** in use (2026-09-02) — the trial is over; Herdr is the live phone→agent surface
+**Status:** in use (2026-11-13). herdr-core and the Herdr mobile app replace the Herdr TUI.
 
-## Resume here
+## Resume here: herdr-core and the mobile app (2026-11-13)
+
+> **Verbatim (Han, 2026-11-13):** "I recently downloaded herdr core. so planning on using it Instead
+> of the tui herdr. check what we can do"
+
+> **Verbatim (Han, 2026-11-13):** "check worktree and notifications first"
+
+> **Verbatim (Han, 2026-11-13):** "Yes, I am using The Mobile app right now. We can do number one.
+> Right now."
+
+"Number one" was the migration in this repo: install herdr-core instead of the TUI, drop the TUI's
+Claude Code hook, and rewrite this record around the mobile app.
+
+> **Verbatim (Han, 2026-11-13):** "And yes, let's Remove The old tui related stuff. It would be nice
+> if you can clean up my two other devices too. And yes, I used the curl installer. So no homebrew."
+
+So `setup.sh` uses Herdr's curl installers, not the `herdr-app` cask. On 2026-11-13 the TUI binary,
+`~/.config/herdr` and its agent integrations (Claude, Codex, pi) were removed from the Mac and both
+Linux machines. Every one of those integrations exited early outside the TUI, so none did anything
+under herdr-core.
+
+Herdr is still here to stay; this is a different Herdr program. The TUI keeps its own server, and
+herdr.dev says the two "don't share agents".
+
+**What runs now (verified 2026-11-13):** `hc 0.1.21` and the Herdr app `0.1.15` on the Mac, with
+`hc` also on the Linux machines, added with `hc machine add`. The phone runs the Herdr mobile app.
+It talks to herdr-core on each machine over SSH, with no Herdr account or server in between.
+herdr.dev/mobile says "Herdr TUI isn't supported" there.
+
+| TUI command | Now |
+|---|---|
+| `herdr agent start\|prompt\|read\|wait\|list` | `hc run --bg`, `hc send`, `hc read`, `hc wait`, `hc ls`. `hc wait --children` waits on helpers. `hc --skill` prints the agent manual. |
+| `herdr worktree create\|open\|remove` | **App only:** New / Open / Remove worktree in the space menu, into `~/.herdr/worktrees/<repo>/<branch>`. No `hc` or `herdr-app do` command exists. An agent runs `git worktree add` itself, then `hc run --bg --cwd <checkout>`. |
+| `herdr notification show` | **No CLI.** See notifications below. |
+| panes and workspaces | `herdr-app do space.new\|tab.new\|pane.split`; `herdr-app --skill` prints its manual. |
+
+**Notifications.** A program reports its status with OSC 7501
+(`printf '\e]7501;state=blocked:app=x\e\\'`). On `blocked`, or `done` while nobody is looking, the
+Mac app plays a sound and shows a toast. The status clears when an interactive shell returns to its
+prompt, so a bare `printf` at the prompt shows nothing. Free text needs a mod calling `notify()`.
+OSC 777 was tested in a pane on 2026-11-13 and showed nothing. The mobile app shows a banner only
+while it is open, and has no push notifications. So the idea of posting the workspace console's
+silent rebuild failures (`repos/docs/backlog.md`) is open again.
+
+**Agent isolation still holds.** The 2026-09-02 reason below for separate sessions over in-process
+subagents carries over to `hc run`, and per-reviewer checkouts carry over to `git worktree add`.
+
+## 2026-09-02: the Herdr TUI adopted (history)
 
 **The trial happened, it passed, and Herdr is adopted.**
 

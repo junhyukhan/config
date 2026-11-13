@@ -8,11 +8,10 @@
      don't append history (history lives in decisions/). -->
 
 **Phone → agent interaction** ([`decisions/phone-agent-interaction.md`](decisions/phone-agent-interaction.md))
-— in progress. The hand-rolled session launcher is **superseded**: Herdr (`herdrdev/herdr`, Rust,
-Apache-2.0, verified binary) covers session persistence, multi-harness, native attach, and the
-working/blocked/idle signal tmux can't give. **Next: trial Herdr on the Mac.** The tmux prefix change
-is parked until that lands; the secret web editor and iOS input ergonomics are independent and still
-open.
+— in use. herdr-core (`hc`) keeps terminals and agents alive on each machine. The Herdr app shows
+them on the Mac, and the Herdr mobile app reaches each core over SSH. It replaced the Herdr TUI on
+2026-11-13. Open: there is no notification CLI and no push to the phone; the tmux prefix change,
+the secret web editor and iOS input ergonomics are still open.
 
 The `claude/` stow package now carries two workflow skills — `grill` and `decide` — alongside
 `sync-repos`. `sync-repos` also reports merged branches at the end of a run (reports only; deleting
@@ -57,7 +56,8 @@ carries the old "never commit or push" wording.
     absorbed from `mattpocock/skills`, what was left, and why it became two skills.
   - [`decisions/phone-agent-interaction.md`](decisions/phone-agent-interaction.md) — using the
     iPhone as a real control surface: why SSH+tmux is the right door, the launcher design and why
-    **Herdr supersedes it**, where chat belongs (low-bandwidth only), and the secret web editor.
+    **Herdr supersedes it**, the move to herdr-core and the mobile app, where chat belongs
+    (low-bandwidth only), and the secret web editor.
   - [`decisions/supabase-mcp.md`](decisions/supabase-mcp.md) — project-pinned Supabase MCP: what
     `--read-only` enforced, why the token lives in `.zshrc` not `.mcp.json`, and **D4 (2026-08-06):
     the flag goes back on and the CLI becomes the write path** — the two tools split by direction

@@ -62,9 +62,8 @@ stow -R -t "$HOME" shell nvim ghostty vim git tmux
 # repo. See "`claude` package uses --no-folding" in AGENTS.md.
 stow -R --no-folding -t "$HOME" claude
 
-# herdr and zed: --no-folding for the same reason -- ~/.config/herdr holds herdr's
-# sockets, logs and session.json. Only each tool's settings file is tracked.
-stow -R --no-folding -t "$HOME" herdr zed
+# zed: --no-folding for the same reason -- only its settings file is tracked.
+stow -R --no-folding -t "$HOME" zed
 
 # cloudflared is only used on Fedora
 if [[ -f /etc/fedora-release ]]; then
@@ -87,20 +86,22 @@ fi
 # A tool installed this way is DECLARED here rather than tracked as files --
 # the binaries and anything they generate (hooks, caches) are theirs to write.
 
-# herdr - agent-aware terminal multiplexer (herdr.dev). The installer reads
-# herdr.dev/latest.json and drops the binary in ~/.local/bin, which .zshrc
-# already puts on PATH.
-if ! command -v herdr &>/dev/null; then
-    echo "Installing herdr..."
-    curl -fsSL https://herdr.dev/install.sh | sh
-fi
-# Its Claude Code integration writes ~/.claude/hooks/herdr-agent-state.sh, which
-# the tracked settings.json references. Installing it here is what makes that
-# reference valid on a fresh machine -- the hook itself is herdr's to own, so it
-# is deliberately not tracked.
-if command -v herdr &>/dev/null && [[ ! -f "$HOME/.claude/hooks/herdr-agent-state.sh" ]]; then
-    echo "Installing herdr's Claude Code integration..."
-    herdr integration install claude || true
+# Herdr - herdr-core (`hc`) keeps terminals and agents alive; the Herdr app
+# (macOS) and the Herdr mobile app are its clients. Both installers read
+# releases.herdr.dev/<core|app>/latest.json and check the SHA-256 before
+# installing. The app installer puts Herdr.app in ~/Applications and installs
+# herdr-core into ~/.local/bin only if none exists; after that, the app keeps
+# itself and the core updated. Linux machines get only the core: the Mac and
+# the phone reach them over SSH (`hc machine add`), and `hc machine update`
+# updates it from the Mac.
+if [[ "$OSTYPE" == darwin* ]]; then
+    if [[ ! -d "$HOME/Applications/Herdr.app" && ! -d /Applications/Herdr.app ]]; then
+        echo "Installing the Herdr app (and herdr-core)..."
+        curl -fsSL https://releases.herdr.dev/app/install.sh | sh
+    fi
+elif ! command -v herdr-core &>/dev/null && [[ ! -x "$HOME/.local/bin/herdr-core" ]]; then
+    echo "Installing herdr-core..."
+    curl -fsSL https://releases.herdr.dev/core/install.sh | sh
 fi
 
 # --------------------------------------------------------------------
