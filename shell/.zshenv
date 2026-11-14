@@ -25,3 +25,11 @@
 # MCP working regardless of how a session was launched.
 [ -r "$HOME/.supabase/access-token" ] && \
     export SUPABASE_ACCESS_TOKEN="$(cat "$HOME/.supabase/access-token")"
+
+# ~/.local/bin holds claude, pi, hc and herdr-core. herdr-core starts agents with
+# a non-interactive login environment, which never reads .zshrc, so the PATH
+# entry has to live here too (.zshrc keeps its own line for interactive shells).
+case ":$PATH:" in
+    *":$HOME/.local/bin:"*) ;;
+    *) export PATH="$HOME/.local/bin:$PATH" ;;
+esac
