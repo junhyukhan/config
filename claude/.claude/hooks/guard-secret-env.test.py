@@ -1,8 +1,6 @@
 import json, subprocess, os, sys
 
-HOOK = os.path.join(
-    os.path.expanduser("~"), "workdir/repos/config/claude/.claude/hooks/guard-secret-env.py"
-)
+HOOK = os.path.join(os.path.dirname(os.path.abspath(__file__)), "guard-secret-env.py")
 
 def run(cmd):
     r = subprocess.run(
@@ -21,7 +19,7 @@ CASES = [
     ("infisical secrets get OPENAI_API_KEY --env=prod", True),
     ("infisical run --env=prod -- env", True),
     ("infisical run --env=prod -- printenv", True),
-    ("cd duri-v3 && infisical export --env=dev", True),
+    ("cd sample-app && infisical export --env=dev", True),
     ("infisical export --env=prod | grep OPENAI", True),
 
     # --- must NOT block: safe, and blocking them would break the workflow ---
@@ -34,13 +32,13 @@ CASES = [
     ("infisical login", False),
     ("infisical init", False),
     ("infisical --version", False),
-    # The real push script must still work — it exports to a file.
-    ("scripts/push-duri-env.sh --dry-run", False),
+    # A deployment script name alone does not dump values.
+    ("scripts/push-app-env.sh --dry-run", False),
 
     # --- .env.public is declared non-secret; near-misses are NOT ---
     ("cat .env.public", False),
     ("grep NEXT_PUBLIC_SUPABASE_URL .env.public", False),
-    ("cat duri-v3/.env.public", False),
+    ("cat sample-app/.env.public", False),
     ("cat .env.production", True),      # prefix-match would wrongly allow this
     ("cat .env.public.local", True),    # only the exact name is exempt
     ("cat .env.publickey", True),

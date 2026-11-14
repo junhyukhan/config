@@ -1,7 +1,7 @@
 ---
 workspace:
   readfirst: docs/README.md
-  verify: stow -n -R -t "$HOME" shell nvim ghostty vim git tmux && stow -n -R --no-folding -t "$HOME" claude zed && scripts/check-guards.sh
+  verify: python3 -B -m unittest discover -s scripts -p 'test_install_claude_settings.py' && python3 -B claude/.claude/hooks/guard-secret-env.test.py && stow -n -R -t "$HOME" shell nvim ghostty vim git tmux && stow -n -R --no-folding -t "$HOME" claude zed && scripts/check-guards.sh
   autonomy: chore
 ---
 
@@ -49,14 +49,21 @@ dnf repoquery --userinstalled --qf '%{name}' | sort > fedora/packages.txt
 
 **Symlink-based with GNU Stow**: Each top-level directory (shell, nvim, ghostty, vim, git, tmux, claude, vscode, cloudflared) is a stow package. The directory structure inside each package mirrors the path relative to `$HOME`. Running `stow -t ~ <package>` creates symlinks accordingly.
 
-**No agent instructions are tracked here.** Since 2026-10-10 the `claude` package carries only
-`settings.json` and the hooks it runs: the guards. The global `AGENTS.md`, `CLAUDE.md`, skills and
-slash commands were removed, and there is no `codex` package. A machine that still has them holds
+**No global agent instructions are tracked here.** The `claude` package carries a public
+`settings.json` bootstrap template and the hooks it runs. Runtime settings are a private
+regular file, not a Stow link; see **`docs/claude-settings.md`** before updating the
+template. The global `AGENTS.md`, `CLAUDE.md`, skills and slash commands were removed,
+and there is no `codex` package. A machine that still has them holds
 them as local files this repo does not manage.
 
 **Restowing / moving the repo**: Stow creates *relative* symlinks, so moving the repo directory breaks every link. To recover, re-run `./setup.sh` from the new location (it uses `stow -R`, which is idempotent and rebuilds the links).
 
-**`claude` package uses `--no-folding`**: Claude Code writes runtime state (`sessions/`, `jobs/`, `plugins/`, `history.jsonl`, logs, etc.) into `~/.claude`. If stow folds the whole directory into a single `~/.claude` symlink, all that runtime state lands inside this repo. `--no-folding` keeps `~/.claude` a real directory and symlinks only the tracked files (`settings.json`, `hooks/*`). Runtime state is also ignored via `.gitignore` (`claude/.claude/*` with whitelisted configs).
+**`claude` package uses `--no-folding`**: runtime state must stay outside this repo.
+Only `hooks/*` are linked. The package-local Stow ignore excludes `settings.json`;
+`python3 scripts/install-claude-settings.py` creates private local settings or detaches
+an old settings symlink without changing its bytes. Existing regular settings are never
+overwritten. Do not put actual hostnames, addresses or private repo inventories in the
+public template. Hook source edits are still live through Stow.
 
 **`vscode` package is darwin-only and also uses `--no-folding`**, for both of the reasons above at
 once. Its path (`Library/Application Support/Code/User`) is macOS-specific — Fedora uses
@@ -71,7 +78,8 @@ drag all of that into the repo. Only `settings.json` and `keybindings.json` are 
 that Claude Code spawns MCP servers as. Anything an agent-launched process must see (env exports
 like `SUPABASE_ACCESS_TOKEN`) belongs in `.zshenv`; everything interactive — prompt, plugins,
 aliases, completions — stays in `.zshrc`. Putting the Supabase PAT in `.zshrc` made the MCP fail
-with `✘ Connection closed` while the credentials were fine (`docs/decisions/supabase-mcp.md`, D4).
+with `✘ Connection closed` while the credentials were fine. The public summary is
+`docs/decisions/supabase-mcp.md`; the personalized history is retained privately.
 
 **What belongs where — the rule for a reproducible machine.** The repo's job is that a fresh
 machine ends up like this one, so every thing on it falls into exactly one of three buckets:
@@ -100,13 +108,14 @@ Your own Herdr settings (`settings.json`, `keys.json`) are not tracked yet.
 | nvim | `~/.config/nvim/init.lua`, `~/.config/nvim/lazy-lock.json` |
 | ghostty | `~/.config/ghostty/config` |
 | vim | `~/.vimrc` |
-| claude | `~/.claude/` — `settings.json` (permission gates, hooks, auto-mode context) and `hooks/*` (`guard-secret-env.py`, `format-on-edit.py`) — via `--no-folding` |
+| claude | `~/.claude/hooks/*` via `--no-folding`; settings are bootstrapped as a private regular file, not linked |
 | cloudflared | `~/.cloudflared/config.yml` (Fedora only, auto-stowed on Fedora) |
 | zed | `~/.config/zed/settings.json` — settings only, via `--no-folding` |
 
-> The `claude` package holds what is enforced on every machine: `settings.json` and the hooks
-> it names. Add a hook by dropping the file in `claude/.claude/hooks/` and re-running
-> `./setup.sh` (or `stow -R --no-folding -t ~ claude`) — never hand-create the symlink.
+> Add a hook under `claude/.claude/hooks/` and restow with `--no-folding`.
+> Registration changes in the public settings template must also be deliberately
+> reviewed and applied to each machine's private settings; a pull does not apply them.
+> Use synthetic homes for installer tests; never run setup just to validate a change.
 
 ## Agent tooling (workspace scaffolding)
 

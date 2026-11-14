@@ -1,6 +1,5 @@
 {
   "permissions": {
-    "defaultMode": "auto",
     "ask": [
       "Bash(git push *)",
       "Bash(git * push)",
@@ -27,7 +26,8 @@
       "Bash(gh api --field *)",
       "Bash(gh api --raw-field *)",
       "Bash(gh api --input *)"
-    ]
+    ],
+    "defaultMode": "auto"
   },
   "model": "opus",
   "enabledMcpjsonServers": [
@@ -75,6 +75,7 @@
     "enabled": true,
     "mode": "hold"
   },
+  "autoMemoryEnabled": false,
   "theme": "auto",
   "switchModelsOnFlag": true,
   "remoteControlAtStartup": true,
@@ -95,17 +96,17 @@
     "environment": [
       "### Org-wide",
       "**Organization**: None configured (personal GitHub account `junhyukhan`)",
-      "**Cloud provider(s)**: Vercel (duri-v3.vercel.app), Supabase (api.supabase.com), Tailscale tailnet (tail114865.ts.net) — inferred from observed hosts in this project's transcripts",
-      "**Repository visibility**: PUBLIC personal repos (any push there is publishing): `config`, `homelab`, `jhkn.dev`, `algorithms`, `k3s-dashboard`, `genkit`, `til`, `junhyukhan.github.io`, `ostep-projects`, `codecrafters-shell-go`, `leetcode`, `leetcode-submission-saver`, `courses`, `junhyukhan`. Private: `workspace`, `duri-v3`, `quant`, `barkeep`, `learning`, `hskorea`, `duri-v2`, `duri`, `core-wiki`, `hskorea.net`, `toss-coffee-order`, `codecrafters-http-server-python`, `mlga`",
+      "**Cloud provider(s)**: Configure actual providers and deployment targets only in local settings; do not infer trust from historical observations",
+      "**Repository visibility**: Verify the target repository's current visibility before publishing; unknown visibility does not authorize confidential material. Any public push is publishing",
       "**Internal sharing / snippet hosting**: None configured — treat public paste/gist services as outside the trust boundary",
       "**Secrets management**: Infisical Cloud, one project per repo that needs env; real env files are never read or printed",
       "**Default / protected branches**: default branch `main`; rulesets not queryable here and no classic protected branches listed — treat `main` as review-worthy anyway",
-      "**CI/CD deploy targets**: None configured (Vercel deployments for duri-v3 observed in transcripts but not confirmed as a configured target)",
-      "**Network posture**: Tailscale tailnet (tail114865.ts.net) reaching personal hosts `jun-hp-spectre`, `juns-fedora`, `juns-macbookpro`; LAN addresses 192.168.45.0/24 and tailnet 100.x observed",
-      "**Source control**: GitHub personal account `junhyukhan` — the trusted repos and their remotes under `https://github.com/junhyukhan/`, as scoped by the Trusted repos and Repository visibility entries",
-      "**Trusted internal domains**: tail114865.ts.net (personal tailnet hosts jun-hp-spectre, juns-fedora, juns-macbookpro)",
+      "**CI/CD deploy targets**: Configure actual targets only in local settings; no deployment is authorized by these defaults",
+      "**Network posture**: Actual tailnet, hostnames and addresses belong only in local settings, not in public configuration",
+      "**Source control**: Verify repository identity and current visibility; an account name or local checkout path does not establish trust",
+      "**Trusted internal domains**: None declared in public defaults; populate reviewed domains only in local settings",
       "**Trusted cloud buckets**: None configured",
-      "**Key internal services**: personal homelab hosts over Tailscale (jun-hp-spectre.tail114865.ts.net, juns-fedora.tail114865.ts.net, juns-macbookpro.tail114865.ts.net); duri-v3.vercel.app; herdr.dev",
+      "**Key internal services**: Concrete service names and endpoints belong only in local settings",
       "**Internal package registry**: None configured (public registry.npmjs.org observed)",
       "**Sensitive data locations & audiences**: any file or store holding personal data, confidential business data, credentials, regulated data, or similarly sensitive material; preserve exact handles when known and share only with audiences cleared at the [named+specifics] bar",
       "**Data retention / declassification**: None configured",
@@ -114,10 +115,9 @@
       "**Protected IaC scopes**: IAM, RBAC, networking, quota, and node-pool resources; anything whose name or tag carries `prod` or `production` as a whole word or name segment",
       "### User-specific",
       "**Primary use of Claude Code**: software development (personal projects: dotfiles/workspace tooling, homelab, side apps)",
-      "**Trusted repos**: the user's own repositories cloned under `~/workdir/repos`, each with its remote under https://github.com/junhyukhan/ — confidential material is fine only in the ones listed as Private under Repository visibility; content ported, repointed, or first read from outside this session's repo is not its own work. Visibility scopes confidential material only: secrets and sensitive data are never cleared into any repo by its visibility.",
+      "**Trusted repos**: Verify repository identity, ownership and visibility before sharing confidential material. A private repository does not clear secrets or sensitive data for storage. Content ported, repointed, or first read from outside this session's repo is not its own work; any concrete private-repository inventory belongs only in local settings.",
       "**Org-specific CLIs**: uv, npx, tailscale, hc (herdr-core), herdr-app, stow, psql (personal toolchain observed in this project)"
     ]
   },
-  "voiceEnabled": true,
-  "autoMemoryEnabled": false
+  "voiceEnabled": true
 }

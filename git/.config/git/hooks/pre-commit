@@ -10,22 +10,16 @@ Read the trade-offs at the bottom before doing either.
 
 Why this exists
 ---------------
-`format-on-edit.py` (PostToolUse) formats what *Claude* writes, and it closed the
-drift that had put duri-v3's `format:check` red across 60 files. But it is wired on
+`format-on-edit.py` (PostToolUse) formats what *Claude* writes. But it is wired on
 `Edit|Write|MultiEdit`, so it never sees:
 
   * an edit made through **Bash** — `sed -i`, `perl -pi`, a `cat > file` heredoc.
-    Measured 2026-08-10: `duri-v3/src/components/app-header.tsx` was changed in
-    PR #47, three days after that hook landed, and arrived unformatted with its
-    JSX attributes unwrapped — the signature of an in-place stream edit.
   * an edit made **outside Claude Code entirely** — an editor, another agent, a
     merge resolution.
 
 A commit is the one chokepoint every edit passes through regardless of who or what
-made it. That is the argument for putting the check here rather than adding more
-tool names to the PostToolUse matcher: the matcher enumerates paths, and the whole
-lesson of the gates in `duri-v3/docs/06` is that an enumerated list is the thing
-that turns out to be incomplete.
+made it. That is the argument for putting the check here rather than trying to
+enumerate every possible editing tool in the PostToolUse matcher.
 
 Opt-in is by CONFIG, not by binary
 ----------------------------------

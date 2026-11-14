@@ -11,7 +11,7 @@ payload never bricks the session.
 
 What counts as a secret env file (by basename):
   .env, .env.local, .env.hosted, .env.production, .env.production.local,
-  duri.env, anything.env, .env.<anything>  ...  EXCEPT anything ending in .example
+  app.env, anything.env, .env.<anything>  ...  EXCEPT anything ending in .example
 
 Read/Edit/Grep: denied if the target path is a secret env file (these always
 surface file contents).
@@ -30,11 +30,9 @@ import json
 def is_secret_name(name: str) -> bool:
     if name.endswith(".example"):        # templates are always fine
         return False
-    # `.env.public` declares itself non-secret, and duri-v3 uses it for the two
-    # NEXT_PUBLIC_* values Next inlines into the CLIENT bundle at build time —
-    # i.e. values anyone can already download. Guarding them made them look
-    # sensitive AND made the secret file they used to live in undeletable, since
-    # deploy-duri.sh read its build args from it.
+    # `.env.public` declares itself non-secret: client-bundled build values can
+    # already be downloaded by anyone. The exception is by exact basename,
+    # not by project identity.
     #
     # EXACT match, not a prefix: `.env.production` must stay guarded, and it
     # would pass a `.startswith(".env.pub")` test.
@@ -44,7 +42,7 @@ def is_secret_name(name: str) -> bool:
         return True
     if name.startswith(".env."):         # .env.local, .env.hosted, .env.production...
         return True
-    if name.endswith(".env"):            # duri.env, foo.env
+    if name.endswith(".env"):            # app.env, foo.env
         return True
     return False
 
@@ -72,7 +70,7 @@ SEG_SPLIT = re.compile(r"\|\||&&|[|;&\n]")
 
 # --- Infisical -------------------------------------------------------------
 # Added 2026-09-12, after a dispatched security review found that migrating
-# duri's secrets to Infisical had SILENTLY REMOVED a protection this hook used
+# an application's secrets to Infisical had SILENTLY REMOVED a protection this hook used
 # to provide. `cat .env.hosted` was blocked; `infisical export`, which prints
 # the exact same values to stdout, was not — because every rule above matches a
 # *filename*, and Infisical has no file to match. The guard has to follow the

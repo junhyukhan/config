@@ -7,8 +7,8 @@
 *.key
 credentials*.json
 
-# Claude Code writes runtime state into ~/.claude (symlinked here).
-# Ignore everything under the package, then whitelist tracked configs.
+# Runtime settings/state must stay outside the checkout. Also defend against
+# accidental state from an old folded package; whitelist public sources only.
 claude/.claude/*
 !claude/.claude/settings.json
 !claude/.claude/commands/

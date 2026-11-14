@@ -21,7 +21,7 @@ config/
 │   └── .vimrc               # -> ~/.vimrc
 ├── claude/                   # Agent config (stowed with --no-folding)
 │   └── .claude/
-│       ├── settings.json     # -> ~/.claude/settings.json  (gates, hooks, auto-mode context)
+│       ├── settings.json     # public defaults; copied once into private local settings
 │       └── hooks/            # -> ~/.claude/hooks/         (e.g. guard-secret-env.py)
 ├── cloudflared/
 │   └── .cloudflared/
@@ -104,8 +104,9 @@ GNU Stow creates symlinks from `$HOME` into this repo. When you edit `~/.config/
 # Link a specific package (-R = restow, idempotent)
 stow -R -t ~ nvim
 
-# The claude package MUST use --no-folding, or ~/.claude becomes a single
-# symlink and Claude Code's runtime state gets written into this repo.
+# Bootstrap private local settings (or preserve existing settings), then link hooks.
+# settings.json is excluded by the package-local Stow ignore.
+python3 scripts/install-claude-settings.py
 stow -R --no-folding -t ~ claude
 
 # Unlink a package
@@ -119,7 +120,8 @@ exist when you last stowed has no symlink yet:
 
 | What the pull changed | Action |
 |---|---|
-| Contents of an already-linked file (`settings.json`, `.zshrc`, `init.lua`) | **Nothing.** The symlink points into the repo, so new content is live immediately. |
+| Contents of an already-linked file (`.zshrc`, `init.lua`, hooks) | **Nothing.** The symlink points into the repo, so new content is live immediately. |
+| Public Claude settings template | **Review and apply deliberately** to local settings. Existing private settings are not overwritten. |
 | A **new** file (new command/hook/skill, new package) | **Restow.** No symlink exists for it yet. |
 | A **deleted** file | **Restow.** Otherwise a dangling symlink is left behind; `stow -R` removes it. |
 
@@ -127,7 +129,12 @@ This bites the `claude` package hardest: `--no-folding` gives every command, hoo
 its own symlink, and it's the package that gains files most often. A pull that adds a slash
 command looks like it did nothing until you restow.
 
-So the safe habit is:
+**Before the first update on a machine with the old settings symlink, detach it
+while preserving its contents.** See [Claude settings](docs/claude-settings.md).
+Otherwise pulling the sanitized template immediately replaces the private context
+seen through that old symlink.
+
+After that one-time migration:
 ```bash
 git pull && ./setup.sh
 ```
@@ -135,7 +142,7 @@ git pull && ./setup.sh
 `setup.sh` is idempotent (it restows) and also applies package-list changes. On Fedora it
 runs `sudo dnf install`, so it'll ask for a password — to only refresh the symlinks:
 ```bash
-git pull && stow -R -t ~ shell nvim ghostty vim && stow -R --no-folding -t ~ claude
+git pull && python3 scripts/install-claude-settings.py && stow -R -t ~ shell nvim ghostty vim && stow -R --no-folding -t ~ claude
 ```
 
 Two things no restow can do, because they're outside Stow's job:
@@ -170,6 +177,6 @@ Then commit and push.
 | **vim** | Basic vim config |
 | **Brewfile** | Homebrew packages and casks (macOS) |
 | **packages.txt** | dnf packages (Fedora) |
-| **claude** | Claude Code guards: `settings.json` and the hooks it runs. No agent instructions or skills are tracked. |
+| **claude** | Generic settings defaults and Stow-managed hooks. Runtime settings and machine guard context stay private; see [settings](docs/claude-settings.md). No global instructions or skills are tracked. |
 | **cloudflared** | Dev gateway tunnel config (Fedora only, auto-stowed by setup.sh) |
 | **templates + scripts** | `new-repo.sh` scaffolds the standard `AGENTS.md` / `CLAUDE.md` / `docs/` into a new workspace repo |

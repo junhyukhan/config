@@ -56,10 +56,13 @@ cd "$REPO_DIR"
 # the repo is moved (stow's relative symlinks break when the repo path changes).
 stow -R -t "$HOME" shell nvim ghostty vim git tmux
 
-# claude uses --no-folding so ~/.claude stays a REAL directory with per-file
-# symlinks. Without it, stow folds the whole ~/.claude into one symlink and
-# Claude Code's runtime state (sessions, jobs, logs...) gets written into the
-# repo. See "`claude` package uses --no-folding" in AGENTS.md.
+# Settings contain private machine context and application-written preferences.
+# Bootstrap a regular local file (or detach the legacy settings symlink without
+# changing its contents). Existing regular settings are never overwritten.
+python3 "$REPO_DIR/scripts/install-claude-settings.py"
+
+# Only hooks are stowed. The package-local ignore excludes settings.json;
+# --no-folding keeps runtime state out of the repository.
 stow -R --no-folding -t "$HOME" claude
 
 # zed: --no-folding for the same reason -- only its settings file is tracked.

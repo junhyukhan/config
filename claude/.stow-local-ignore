@@ -1,0 +1,2 @@
+# Settings are private regular files; only hooks are linked by Stow.
+^/\.claude/settings\.json$

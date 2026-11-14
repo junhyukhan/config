@@ -7,12 +7,9 @@ must never break a session or block a write that already succeeded.
 
 Why this exists
 ---------------
-Format drift is created one edit at a time and then cleaned up in bulk: duri-v3
-reached `pnpm format:check` red across **65 files**, including files no recent
-change had touched, which turns every feature diff into a choice between leaving
-drift or sweeping 60 unrelated files into a review. Fixing it at the source is
-cheaper than the recurring cleanup commit.
-(`repos/docs/decisions/ops-modernization.md`, finding ②.)
+Format drift is created one edit at a time and then cleaned up in bulk.
+Formatting opted-in files at the source avoids sweeping unrelated formatting
+changes into a later feature review.
 
 Opt-in is by CONFIG, not by binary
 ----------------------------------
@@ -23,11 +20,10 @@ formatting it would impose a style the repo never chose, on a global hook the
 author of that repo never opted into. Binary-presence is availability; config
 presence is consent.
 
-Current effect, measured 2026-08-06:
-  duri-v3  → prettier (.prettierrc.json + node_modules/.bin/prettier)
-  quant    → ruff     (pyproject.toml [tool.ruff] + .venv/bin/ruff)
-  jhkn-dev → SKIPPED  (prettier binary, no config)
-  homelab, config → skipped (no formatter)
+Examples (synthetic project names):
+  web-app    → prettier (.prettierrc.json + node_modules/.bin/prettier)
+  python-app → ruff     (pyproject.toml [tool.ruff] + .venv/bin/ruff)
+  plain-app  → SKIPPED  (formatter binary, no config)
 
 Known trade, accepted
 ---------------------
