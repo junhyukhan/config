@@ -61,6 +61,10 @@ silent rebuild failures (`repos/docs/backlog.md`) is open again.
 **Agent isolation still holds.** The 2026-09-02 reason below for separate sessions over in-process
 subagents carries over to `hc run`, and per-reviewer checkouts carry over to `git worktree add`.
 
+**The tmux prefix question is closed (2026-11-15).** The phone reaches agents through the Herdr
+mobile app, not tmux over SSH, so there is no phone reason to change the prefix. tmux stays installed
+as a fallback, with `tmux/.tmux.conf` unchanged.
+
 ## 2026-09-02: the Herdr TUI adopted (history)
 
 **The trial happened, it passed, and Herdr is adopted.**
