@@ -66,7 +66,10 @@ python3 "$REPO_DIR/scripts/install-claude-settings.py"
 stow -R --no-folding -t "$HOME" claude
 
 # zed: --no-folding for the same reason -- only its settings file is tracked.
-stow -R --no-folding -t "$HOME" zed
+# herdr-core: only the agent templates are tracked; ~/.config/herdr-core also
+# holds the core's own config.toml. hc reads templates on the machine an agent
+# runs on, so every machine gets them.
+stow -R --no-folding -t "$HOME" zed herdr-core
 
 # cloudflared is only used on Fedora
 if [[ -f /etc/fedora-release ]]; then

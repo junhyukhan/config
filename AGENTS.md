@@ -1,7 +1,7 @@
 ---
 workspace:
   readfirst: docs/README.md
-  verify: python3 -B -m unittest discover -s scripts -p 'test_install_claude_settings.py' && python3 -B claude/.claude/hooks/guard-secret-env.test.py && stow -n -R -t "$HOME" shell nvim ghostty vim git tmux && stow -n -R --no-folding -t "$HOME" claude zed && scripts/check-guards.sh
+  verify: python3 -B -m unittest discover -s scripts -p 'test_install_claude_settings.py' && python3 -B claude/.claude/hooks/guard-secret-env.test.py && stow -n -R -t "$HOME" shell nvim ghostty vim git tmux && stow -n -R --no-folding -t "$HOME" claude zed herdr-core && scripts/check-guards.sh
   autonomy: chore
 ---
 
@@ -111,6 +111,7 @@ Your own Herdr settings (`settings.json`, `keys.json`) are not tracked yet.
 | claude | `~/.claude/hooks/*` via `--no-folding`; settings are bootstrapped as a private regular file, not linked |
 | cloudflared | `~/.cloudflared/config.yml` (Fedora only, auto-stowed on Fedora) |
 | zed | `~/.config/zed/settings.json` — settings only, via `--no-folding` |
+| herdr-core | `~/.config/herdr-core/templates/*.md` — the `hc run <template>` roles (`implementer`, `reviewer`, `reviewer-pi`), via `--no-folding` |
 
 > Add a hook under `claude/.claude/hooks/` and restow with `--no-folding`.
 > Registration changes in the public settings template must also be deliberately

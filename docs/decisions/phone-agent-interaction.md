@@ -61,6 +61,14 @@ silent rebuild failures (`repos/docs/backlog.md`) is open again.
 **Agent isolation still holds.** The 2026-09-02 reason below for separate sessions over in-process
 subagents carries over to `hc run`, and per-reviewer checkouts carry over to `git worktree add`.
 
+**Agent templates (2026-11-15).** `hc run <template> "<task>"` starts a role with its instructions.
+The `herdr-core` package tracks three, and hc reads them on the machine the agent runs on:
+`implementer` (pi, gpt-6.1-sol, in its own worktree), `reviewer` (Claude Code, read-only) and
+`reviewer-pi` (pi, for work Claude built). A reviewer on the other model family does not share the
+implementer's blind spots.
+
+> **Verbatim (Han, 2026-11-15):** "yes, go with that lineup"
+
 **The tmux prefix question is closed (2026-11-15).** The phone reaches agents through the Herdr
 mobile app, not tmux over SSH, so there is no phone reason to change the prefix. tmux stays installed
 as a fallback, with `tmux/.tmux.conf` unchanged.
