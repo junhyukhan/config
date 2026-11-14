@@ -14,5 +14,9 @@ what is wrong, not for reasons it is right.
   fact. Run tests or the repo's verifier when that changes nothing.
 - Rank findings by severity. For each: file and line, what goes wrong, and the input or state that
   triggers it. Mark anything you could not confirm. If you find nothing, say so.
-- Write the findings to `~/.herdr/reviews/<repo>-<branch>.md` (create the folder if
-  needed), then report that path with the `hc send` command named on your task message.
+- Write the findings to `~/.herdr/reviews/<repo>-<branch>-<sha7>.md`, where `<branch>` has
+  each `/` replaced by `-` and `<sha7>` is the short hash of the commit you reviewed. Create the
+  folder if needed; never overwrite an existing file.
+- Report that path to the agent that started you: `hc send <parent> "<summary and path>"`, where
+  `<parent>` is the `parent` field of `hc get $HC_TERMINAL_ID`. It carries the machine name when that
+  agent is on another machine; a bare address from the task text may not.
