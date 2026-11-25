@@ -16,21 +16,13 @@ generated: { by: claude/opus-5-5, at: 2026-11-13T00:00:00Z }
 
 ## Resume here: herdr-core and the mobile app (2026-11-13)
 
-> **Verbatim (Han, 2026-11-13):** "I recently downloaded herdr core. so planning on using it Instead
-> of the tui herdr. check what we can do"
-
-> **Verbatim (Han, 2026-11-13):** "check worktree and notifications first"
-
-> **Verbatim (Han, 2026-11-13):** "Yes, I am using The Mobile app right now. We can do number one.
-> Right now."
-
-"Number one" was the migration in this repo: install herdr-core instead of the TUI, drop the TUI's
+Han installed herdr-core to replace the Herdr TUI and asked what it enables, worktrees and
+notifications first. He was already on the mobile app and chose to migrate right away. The migration
+was the migration in this repo: install herdr-core instead of the TUI, drop the TUI's
 Claude Code hook, and rewrite this record around the mobile app.
 
-> **Verbatim (Han, 2026-11-13):** "And yes, let's Remove The old tui related stuff. It would be nice
-> if you can clean up my two other devices too. And yes, I used the curl installer. So no homebrew."
-
-So `setup.sh` uses Herdr's curl installers, not the `herdr-app` cask. On 2026-11-13 the TUI binary,
+The old TUI setup goes, on the other two devices as well. Han installed with the curl installer, so
+`setup.sh` uses Herdr's curl installers, not the `herdr-app` cask. On 2026-11-13 the TUI binary,
 `~/.config/herdr` and its agent integrations (Claude, Codex, pi) were removed from the Mac and both
 Linux machines. Every one of those integrations exited early outside the TUI, so none did anything
 under herdr-core.
@@ -67,7 +59,7 @@ The `herdr-core` package tracks three, and hc reads them on the machine the agen
 `reviewer-pi` (pi, for work Claude built). A reviewer on the other model family does not share the
 implementer's blind spots.
 
-> **Verbatim (Han, 2026-11-15):** "yes, go with that lineup"
+Han approved this lineup.
 
 **The tmux prefix question is closed (2026-11-15).** The phone reaches agents through the Herdr
 mobile app, not tmux over SSH, so there is no phone reason to change the prefix. tmux stays installed
@@ -77,10 +69,8 @@ as a fallback, with `tmux/.tmux.conf` unchanged.
 
 **The trial happened, it passed, and Herdr is adopted.**
 
-> **Verbatim (Han, 2026-09-02):** "Btw this mobile claude code session is being run inside a herdr
-> session on my laptop, locally. So the herdr mcp/cli/etc can in fact be used."
-
-> **Verbatim (Han, 2026-09-02 — the commitment):** "yes herdr is here to stay."
+The deciding session was a mobile Claude Code session running inside Herdr on the laptop, so the
+Herdr MCP and CLI were usable from the phone. Han: "yes herdr is here to stay."
 
 Everything below the next heading is the 2026-08-27 planning state, kept as history — do not act on
 its "next step".
@@ -135,20 +125,12 @@ already. The assistant presented Remote Control as a finding; it was not one.
 **What Remote Control does not cover is the multi-harness goal** — it is Claude-only. That is the
 whole remaining case for a multiplexer, and it is the case this record was always about.
 
-### Why Herdr over cmux — the ask (verbatim)
+### Why Herdr over cmux
 
-> **Verbatim (2026-08-27, the weight constraint):** "I do want to use a solution that is not too
-> heavy. For example a solution that uses electron (chromium) isnt my favorite unless its really well
-> made."
-
-> **Verbatim (2026-08-27, prior experience and the honest caveat):** "Btw claude code can now ping
-> other claude code sessions. Ive been using it with herdr at work which is nice. Though at work our
-> env is windows so that is not necessarily an argument for going with herdr."
-
-> **Verbatim (2026-08-27):** "Cross compatibility does sound great since i have a thinkpad … Rn i do
-> like the look of herdr"
-
-> **Verbatim (2026-08-27, the go-ahead):** "Yeah lets go with herdr."
+2026-08-27: the tool must not be heavy; Electron is unwelcome unless very well made. Han already used
+Herdr at work with Claude Code sessions pinging each other, though that was on Windows and so not an
+argument by itself. Cross-platform support matters because of the ThinkPad, and he liked Herdr's
+look. He chose Herdr.
 
 **cmux was evaluated and rejected on portability, not weight.** A summarized read would have had it
 dismissed as Electron; the README says otherwise — *"macOS only, for now. cmux is a native Swift +
@@ -175,36 +157,19 @@ two compose rather than compete:
 **Caveat for the trial:** the current 3-day-old `claude rc` is *not* inside Herdr. Moving it ends
 that server; `claude remote-control --continue` restores its sessions for about four hours after.
 
-## Why — the ask (verbatim)
+## Why
 
-> **Verbatim (2026-08-11):** "thinking of improving the way i interact with my agents - through my
-> iphone."
+2026-08-11: Han wanted a better way to drive agents from the iPhone. New sessions are frequent
+(editing `CLAUDE.md` and configs warrants one), and he started them by SSHing from an iPhone
+terminal app into the Mac, then tmux, then Claude. Terminal access matters for editing secret files
+by hand, but key bindings are painful on the phone, and the iPhone Claude app lacks the terminal's
+message suggestions. A better setup should also admit other harnesses such as Codex and Hermes.
 
-> **Verbatim (2026-08-11, the actual flow and its pain):** "In order to create new sessions (as we
-> frequently edit Claude.md files and other configs that warrant a new session - even new shell), I
-> use the terms app on my iPhone to ssh into my Mac, then use tmux then create a Claude session.
-> This is done because at times I need to manually edit files (secret files) so having
-> terminal/filesystem access is helpful. However the key binds are a PITA on my iPhone. + btw the
-> iPhone Claude app doesn't give message suggestions like in Claude code on the terminal which is
-> mildly irritating as typing on a phone is much more cumbersome. + improving all this will allow me
-> to encorporate other agents/harnesses like codex, Hermes, etc. hopefully."
-
-> **Verbatim (2026-08-11, on the launcher idea):** "I do want more info on L1. Not sure what
-> Launchers are. But I like where L1 is headed."
-
-> **Verbatim (2026-08-11, steer — menu shape):** "Hmm actually the majority of our sessions will
-> start in repos. Although a pr review session may start in the project directory"
-
-> **Verbatim (2026-08-12, secret editing):** "Regarding the secret editor, perhaps we can have a web
-> text editor? Lightweight for simple tasks. The phone has tailscale so security isnt a huge
-> concern."
-
-> **Verbatim (2026-08-12, constraint on tmux work):** "Tmux is still used when im on my laptop
-> though (though not alot)"
-
-> **Verbatim (2026-08-12, on chat as an interface):** "Not sure. For claude code, the phone app is
-> probably much better. Discord probably has its place. But probably not my usual feature design and
-> implementation work that requires a lot of back and forth convo"
+Steers along the way: he liked where the launcher idea (L1) was headed and wanted to learn more;
+most sessions start in a repo, though a PR review may start in the project directory (2026-08-11).
+A lightweight web text editor could handle secret edits, since the phone is on Tailscale; tmux is
+still used a little on the laptop; for Claude Code the phone app beats chat, and Discord has a place
+but not for back-and-forth design work (2026-08-12).
 
 ## Discussion
 

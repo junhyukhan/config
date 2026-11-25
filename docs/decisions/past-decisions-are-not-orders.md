@@ -14,11 +14,10 @@ generated: { by: claude/opus-5, at: 2026-09-06T00:00:00Z }
 **Status:** DECIDED (2026-09-06), pending the `AGENTS.md` edit that carries it. Part of the
 restructuring in [`repos/docs/decisions/workspace-lab-split.md`](../../../docs/decisions/workspace-lab-split.md).
 
-## Why — the ask (verbatim)
+## Why
 
-> **Verbatim (2026-09-06):** "everytime i tell the agent i want to change things, it sees that i made
-> contradictory decisions in the past, recorded within my workspace, and conforms to those past
-> decisions."
+2026-09-06: whenever Han asked an agent to change something, it found contradicting past decisions
+in the workspace records and conformed to them instead of the new request.
 
 ## Discussion
 

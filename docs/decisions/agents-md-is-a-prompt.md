@@ -13,15 +13,12 @@ generated: { by: claude/opus-5, at: 2026-09-06T00:00:00Z }
 
 **Status:** DECIDED (2026-09-06).
 
-## Why — the ask (verbatim)
+## Why
 
-> **Verbatim (2026-09-06, on cutting a 21-line section to 11):** "Yes i dont want the agent md to
-> hold unnecessary info. The file is already not an enforced rule for the agent. Having it very long
-> with verbose writing will not help. (In fact the anthropic guides say we should handwrite claude md
-> amd keep it minimal)"
-
-> **Verbatim (2026-09-06, two PR comments that made the same point first):** "Do we need this comment
-> here?" / "Is this necessary?"
+2026-09-06, approving a cut of a 21-line section to 11: AGENTS.md should hold no unnecessary
+information. Nothing enforces it, so length and verbose writing don't help, and Anthropic's guidance
+is to handwrite `CLAUDE.md` and keep it minimal. Two earlier PR comments ("Is this necessary?") made
+the same point.
 
 ## Discussion
 

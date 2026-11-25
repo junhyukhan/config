@@ -17,17 +17,10 @@ generated: { by: claude/opus-5, at: 2026-07-30T00:00:00Z }
 What was taken from an external skills library, what was left, and why it became two skills rather
 than one. Governs [`../../claude/.claude/skills/`](../../claude/.claude/skills/).
 
-## Why — the ask (verbatim)
+## Why
 
-> **Verbatim (2026-07-30):** "i don't want to use these skills blindly, use the ones that make sense
-> for me, and build on top of them. i can clone this repo (mattpocock/skills) in my worskpace if
-> that is better (there are a lot of skills in this repo)"
-
-Settling the clone question:
-
-> **Verbatim (2026-07-30):** "yes, i want 2-3 ideas absorbed into my own skills, i do not want to
-> clone or use mattpocck-skills (i just mentioned cloning cause i assumed that would be easier for
-> you to analyze)."
+2026-07-30: use `mattpocock/skills` selectively, not blindly. Absorb 2 or 3 ideas into Han's own
+skills; don't clone or use the library itself (cloning was only offered to make analysis easier).
 
 ## Discussion
 

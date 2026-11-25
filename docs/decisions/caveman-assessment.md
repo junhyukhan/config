@@ -18,21 +18,11 @@ Assessment of [`juliusbrussee/caveman`](https://github.com/juliusbrussee/caveman
 workspace. Same shape as [`grill-and-decide-skills.md`](grill-and-decide-skills.md), and the same
 verdict pattern — take the ideas, leave the dependency.
 
-## Why — the ask (verbatim)
+## Why
 
-> **Verbatim (2026-08-29):** "also, for these things, i do want you to consider something like
-> https://github.com/juliusbrussee/caveman.
->
-> i dont want to use this skill straight up and for everything. i want to gain inspiration from this,
-> making use of parts that will be useful for me. im sure there are aspects where we can make use of
-> the above."
-
-Said while closing a related fork in the same session:
-
-> **Verbatim (2026-08-29):** "wait but using an index uses the same number of words? is there a point
-> of doing that?"
-
-> **Verbatim (2026-08-29, approving the tightened form):** "yes this new rec is better."
+2026-08-29: Han asked to consider https://github.com/juliusbrussee/caveman as inspiration, not to
+adopt it wholesale: take the parts that are useful. Closing a related fork, he questioned an index
+that costs as many words as the text it indexes, and approved the tightened recommendation instead.
 
 ## Discussion
 

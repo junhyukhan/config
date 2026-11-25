@@ -14,14 +14,14 @@ generated: { by: claude/opus-5, at: 2026-09-01T00:00:00Z }
 **Status:** DECIDED (2026-09-01). Written because the records-owed check began flagging changes to
 these files and was right to.
 
-## Why — the ask (verbatim)
+## Why
 
 No single ask created this. It is the standing shape of two features Han approved separately —
 the unpushed-repos notice (`docs/decisions/…` in `repos`, `journal-and-sync.md`) and the
 checker-liveness line (`repos/docs/decisions/cross-repo-retrieval.md`, Step 2) — plus this, on
 widening what the checker watches:
 
-> **Verbatim (Han, 2026-09-01):** "fix 3 and 5."
+Han approved fixing items 3 and 5 (2026-09-01).
 
 ## Discussion
 
