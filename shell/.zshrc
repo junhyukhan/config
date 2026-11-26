@@ -14,7 +14,7 @@ fi
 # 2. Completion System
 # 3. Navigation & Utilities (Zoxide, FZF)
 # 4. Aliases (Eza, Bat, Git)
-# 5. Plugins & Prompts (Atuin, Starship)
+# 5. Plugins & Prompts (Starship)
 # ====================================================================
 
 # --------------------------------------------------------------------
@@ -48,7 +48,6 @@ fi
 # --------------------------------------------------------------------
 # Section 1: History Settings
 # --------------------------------------------------------------------
-# Note: Atuin handles most history, but these are good fallbacks.
 HISTFILE=~/.zsh_history
 HISTSIZE=10000
 SAVEHIST=10000
@@ -78,7 +77,7 @@ if command -v zoxide >/dev/null 2>&1; then
 fi
 
 # Initialize FZF
-# usage: Ctrl+T (files), Ctrl+R (history - unless Atuin takes over)
+# usage: Ctrl+T (files), Ctrl+R (history)
 if command -v fzf >/dev/null 2>&1; then
   source <(fzf --zsh)
 fi
@@ -125,21 +124,12 @@ alias vim='nvim'
 [[ -f "$ZSH_HIGHLIGHT" ]] && source "$ZSH_HIGHLIGHT"
 [[ -f "$ZSH_SUGGEST" ]] && source "$ZSH_SUGGEST"
 
-# 2. Atuin (Magical Shell History)
-# This replaces standard Ctrl+R and Up-Arrow history search
-# if [ -f "$HOME/.atuin/bin/env" ]; then
-    # . "$HOME/.atuin/bin/env"
-    # eval "$(atuin init zsh)"
-    # If you prefer standard Up-Arrow search, uncomment the bindkey lines below
-    # and configure Atuin to not bind up-arrow in its config.toml
-# else
-    # Fallback if Atuin isn't present
-    autoload -U up-line-or-beginning-search down-line-or-beginning-search
-    zle -N up-line-or-beginning-search
-    zle -N down-line-or-beginning-search
-    bindkey "^[[A" up-line-or-beginning-search
-    bindkey "^[[B" down-line-or-beginning-search
-# fi
+# 2. History search on Up/Down: match what is already typed
+autoload -U up-line-or-beginning-search down-line-or-beginning-search
+zle -N up-line-or-beginning-search
+zle -N down-line-or-beginning-search
+bindkey "^[[A" up-line-or-beginning-search
+bindkey "^[[B" down-line-or-beginning-search
 
 # 3. Powerlevel10k Prompt
 # Must be last to capture previous command exit codes correctly
